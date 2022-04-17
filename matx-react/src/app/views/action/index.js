@@ -53,3 +53,4 @@ export const showError = (status) => {
 
 export { default as Notify } from './Notify'
 export { default as AlertDialog} from './Confirm'
+export { default as Dialog} from './Dialog'
