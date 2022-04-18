@@ -17,7 +17,7 @@ spring:
 #    url: jdbc:mysql://us-cdbr-east-05.cleardb.net:3306/heroku_781fb29ea8dcf9e?createDatabaseIfNotExist=true
 #    username: b705f87f4b6f46
 #    password: 976ea4b9
-    url: jdbc:mysql://127.0.0.1:3306/db_canifa_shop?createDatabaseIfNotExist=true
+    url: jdbc:mysql://127.0.0.1:3306/database_canifa_shop?createDatabaseIfNotExist=true
     username: root
     password: Long02092000
     driverClassName: com.mysql.cj.jdbc.Driver

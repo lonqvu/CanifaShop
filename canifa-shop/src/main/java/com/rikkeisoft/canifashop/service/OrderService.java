@@ -45,7 +45,7 @@ public interface OrderService {
 
 	BasePagerData<OrderResponse> getOrderByMonth(Integer page, Integer size, Integer year, Integer month);
 
-  OrderResponse getByCode(String code);
+  	OrderResponse getByCode(String code);
 
 }
 
@@ -102,13 +102,12 @@ class OrderServiceImpl implements OrderService {
 		if (userEntity != null) {
 			orderEntity.setUserEntity(userEntity);
 		}
-		if (orderEntity != null) {
+		if (promotionEntity != null) {
 			orderEntity.setPromotionEntity(promotionEntity);
 		}
 		orderEntity.setOrderDetailEntities(new HashSet<>());
 
 		orderRequest.getListOrderDetailsRequest().forEach(id -> {
-
 			ProductDetailEntity productDetailEntity = productDetailRepository.findByListId(id.getColorId(),
 					id.getProductId(), id.getSizeId());
 			OrderDetailEntity orderDetailEntity = OrderDetailEntity.builder().quantity(id.getQuantity())

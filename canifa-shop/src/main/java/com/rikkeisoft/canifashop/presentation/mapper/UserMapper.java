@@ -3,6 +3,8 @@ package com.rikkeisoft.canifashop.presentation.mapper;
 import com.rikkeisoft.canifashop.common.enum_.GenderEnum;
 import com.rikkeisoft.canifashop.entity.UserEntity;
 import com.rikkeisoft.canifashop.presentation.request.UserRequest;
+import com.rikkeisoft.canifashop.presentation.response.ProductOrderResponse;
+import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
 import com.rikkeisoft.canifashop.presentation.response.UserResponse;
 
 public class UserMapper {
@@ -28,7 +30,6 @@ public class UserMapper {
 		}
 		return response;
 	}
-
 	// convert request to Entity
 	public static UserEntity convertToEntity(UserRequest request) {
 		UserEntity entity = UserEntity.builder().username(request.getUsername()).firstName(request.getFirstName())

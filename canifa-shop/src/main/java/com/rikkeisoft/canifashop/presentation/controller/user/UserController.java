@@ -41,5 +41,4 @@ public class UserController extends BaseController {
 	public ResponseEntity<BaseResponseEntity> getUserByUsername(@PathVariable("username") String username) {
 		return success(userService.getUserByUsername(username), "Get user successful");
 	}
-
 }

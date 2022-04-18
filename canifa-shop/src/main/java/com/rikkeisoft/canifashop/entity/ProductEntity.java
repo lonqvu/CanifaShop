@@ -88,4 +88,8 @@ public class ProductEntity extends BaseEntity {
 	@JoinColumn(name = "category_id")
 	private CategoryEntity categoryEntity;
 
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_id")
+	private UserEntity userEntities;
+
 }

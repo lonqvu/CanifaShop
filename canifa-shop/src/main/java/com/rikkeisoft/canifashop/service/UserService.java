@@ -1,6 +1,11 @@
 package com.rikkeisoft.canifashop.service;
 
 import java.util.HashSet;
+
+import com.rikkeisoft.canifashop.entity.ProductEntity;
+import com.rikkeisoft.canifashop.presentation.request.ProductRequest;
+import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
+import com.rikkeisoft.canifashop.repository.ProductRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -55,16 +60,18 @@ public interface UserService {
 
 	boolean hasUsername(String username);
 
+	ProductEntity EntityById(Long id);
 }
 
 @Service
 @RequiredArgsConstructor
 class UserServiceImpl implements UserService {
-
+	public final ProductRepository productRepository;
 	public final UserRepository userRepository;
 	public final PasswordEncoder passwordEncoder;
 	public final RoleRepository roleRepository;
 	public final EmailService emailService;
+
 
 	@Override
 	public void createAdmin(UserEntity entity) {
@@ -73,6 +80,10 @@ class UserServiceImpl implements UserService {
 		entity.setRoleEntities(new HashSet<RoleEntity>());
 		entity.addRoleEntity(role);
 		userRepository.save(entity);
+	}
+	@Override
+	public ProductEntity EntityById(Long id) {
+		return productRepository.findById(id).orElse(null);
 	}
 
 	@Override
@@ -174,6 +185,8 @@ class UserServiceImpl implements UserService {
 		return entity;
 	}
 
+
+
 	@Override
 	public void resetPassword(String name) throws MessagingException {
 		UserEntity entity = userRepository.findbyEmailorUsername(name);
@@ -222,5 +235,5 @@ class UserServiceImpl implements UserService {
 	public boolean hasUsername(String username) {
 		return userRepository.existsByUsername(username);
 	}
-
+	
 }

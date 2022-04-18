@@ -81,6 +81,14 @@ public class UserEntity extends BaseEntity {
 		userAddressEntity.setUserEntity(null);
 	}
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntities")
+	private Set<ProductEntity> productEntities;
+
+	public void addProductEntity(ProductEntity productEntity) {
+		this.productEntities.add(productEntity);
+		productEntity.setUserEntities(this);
+	}
+
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "userEntities")
 	private Set<RoleEntity> roleEntities;
 

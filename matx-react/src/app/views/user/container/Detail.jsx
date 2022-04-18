@@ -370,6 +370,20 @@ const Detail = () => {
                                             THÊM VÀO GIỎ HÀNG
                                         </Button>
                                     </Stack>
+
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="center"
+                                    >
+                                        <Button
+                                            variant="contained"
+                                            color="inherit"
+                                            style={{ width: '100%' }}
+                                            onClick={()=>console.log(product.id)}
+                                        >
+                                            Thêm vào sản phẩm yêu thích
+                                        </Button>
+                                    </Stack>
                                 </Box>
                             </Grid>
                         </Grid>

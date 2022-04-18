@@ -3,6 +3,7 @@ package com.rikkeisoft.canifashop.presentation.request;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,6 @@ public class OrderRequest {
 	private Long userId;
 
 	private Long promotionId;
-	
+
 	private List<OrderDetailsRequest> listOrderDetailsRequest;
 }

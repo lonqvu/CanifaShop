@@ -9,8 +9,10 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import com.rikkeisoft.canifashop.entity.*;
+import com.rikkeisoft.canifashop.presentation.mapper.OrderMapper;
 import com.rikkeisoft.canifashop.presentation.request.ColorSizeRequest;
 import com.rikkeisoft.canifashop.entity.CategoryEntity;
+import com.rikkeisoft.canifashop.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +50,10 @@ public interface ProductService {
 	ProductEntity getEntityById(Long id);
 
 	ProductEntity getEntityBySeo(String seo);
+
+//	ProductResponse listFavourite(ProductRequest productRequest);
+//
+//	UserEntity getUserEntityById(Long id);
 }
 
 @Service
@@ -59,6 +65,7 @@ class ProductServiceImpl implements ProductService {
 	private final CategoryService categoryService;
 	private final ColorService colorService;
 	private final SizeService sizeService;
+	private final UserRepository userRepository;
 
 	@Override
 	public List<ProductResponse> getAll() {
@@ -183,6 +190,17 @@ class ProductServiceImpl implements ProductService {
 		}
 	}
 
+//	@Override
+//	public ProductResponse listFavourite(ProductRequest productRequest) {
+//		UserEntity userEntity = this.getUserEntityById(productRequest.getUserId());
+//		ProductEntity productEntity = ProductMapper.convertToEntity(productRequest);
+//		productEntity.setSeo(new Slugify().slugify(productRequest.getName()));
+//		if(userEntity!=null){
+//			productEntity.setUserEntities(userEntity);
+//		}
+//		return ProductMapper.convertToResponse(productRepository.save(productEntity));
+//	}
+
 	private void createProductDetail(ProductEntity product, List<ColorSizeRequest> listColors) {
 		product.setProductDetailEntities(new HashSet<>());
 		listColors.forEach(c -> {
@@ -195,5 +213,14 @@ class ProductServiceImpl implements ProductService {
 			});
 		});
 	}
+
+//	@Override
+//	public UserEntity getUserEntityById(Long id) {
+//		if (id != null) {
+//			return userRepository.findById(id).get();
+//		} else {
+//			return null;
+//		}
+//	}
 
 }

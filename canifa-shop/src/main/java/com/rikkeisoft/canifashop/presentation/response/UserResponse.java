@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -30,5 +32,5 @@ public class UserResponse extends BaseResponse{
 	private boolean locked;
 
 	private int gender;
-	
+
 }

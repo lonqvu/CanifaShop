@@ -41,4 +41,5 @@ public class ProductResponse extends BaseResponse {
 	private Integer discount;
 
 	private boolean isHot;
+
 }
