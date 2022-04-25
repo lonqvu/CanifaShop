@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
-
+	ProductEntity findByIdAndDeletedFlagFalse(Long id);
 	@Query(value = "SELECT * FROM tbl_products WHERE deleted_flag IS FALSE "
 			+ "AND (:keyword IS NULL or (name LIKE %:keyword% OR category_id IN (SELECT id FROM tbl_categories WHERE name LIKE %:keyword%))) ", nativeQuery = true)
 	Page<ProductEntity> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);

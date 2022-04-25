@@ -1,0 +1,70 @@
+package com.rikkeisoft.canifashop.service;
+
+import com.rikkeisoft.canifashop.base.BasePagerData;
+import com.rikkeisoft.canifashop.common.exception.BadRequestException;
+import com.rikkeisoft.canifashop.entity.ProductCommentEntity;
+import com.rikkeisoft.canifashop.entity.ProductEntity;
+import com.rikkeisoft.canifashop.entity.UserEntity;
+import com.rikkeisoft.canifashop.presentation.mapper.OrderMapper;
+import com.rikkeisoft.canifashop.presentation.mapper.ProductCommentMapper;
+import com.rikkeisoft.canifashop.presentation.request.ProductCommentRequest;
+import com.rikkeisoft.canifashop.presentation.response.ProductCommentResponse;
+import com.rikkeisoft.canifashop.repository.ProductCommentRepository;
+import com.rikkeisoft.canifashop.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+public interface ProductCommentService {
+    ProductCommentResponse createComment(ProductCommentRequest productCommentRequest, Long id);
+    ProductCommentResponse editComment(ProductCommentRequest productCommentRequest, Long id);
+    ProductCommentResponse deleteComment(ProductCommentRequest productCommentRequest, Long id);
+    BasePagerData<ProductCommentResponse> getListComment(Integer page, Integer size, Long id);
+}
+@Service
+@RequiredArgsConstructor
+class ProductCommentServiceImpl implements ProductCommentService{
+    private final ProductRepository productRepository;
+    private final ProductCommentRepository productCommentRepository;
+    private final UserService userService;
+    private final ProductService productService;
+    @Override
+    public ProductCommentResponse createComment(ProductCommentRequest productCommentRequest, Long id) {
+        ProductEntity productEntity = productRepository.findByIdAndDeletedFlagFalse(id);
+        if(productEntity == null){
+            throw new BadRequestException("Product does not exist");
+        }
+        ProductCommentEntity productCommentEntity = ProductCommentMapper.convertToEntity(productCommentRequest);
+        if(productCommentEntity.getParentId() != null && !productCommentRepository.existsById(productCommentRequest.getParenId())){
+            throw new BadRequestException("ParentId Product does not exist");
+        }
+        if(productCommentEntity.getParentId() == null){
+            productCommentEntity.setParentId(0L);
+        }
+        UserEntity userEntity = userService.getEntityById(productCommentRequest.getUserId());
+        productCommentEntity.setProductEntity(productEntity);
+        productCommentEntity.setUserEntity(userEntity);
+        return ProductCommentMapper.convertToResponse(productCommentRepository.save(productCommentEntity));
+    }
+
+    @Override
+    public ProductCommentResponse editComment(ProductCommentRequest productCommentRequest, Long id) {
+        return null;
+    }
+
+    @Override
+    public ProductCommentResponse deleteComment(ProductCommentRequest productCommentRequest, Long id) {
+        return null;
+    }
+
+    @Override
+    public BasePagerData<ProductCommentResponse> getListComment(Integer page, Integer size, Long id) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<ProductCommentEntity> pageResult = productCommentRepository.findByProductId(id, paging);
+        return BasePagerData.build(pageResult.map(e -> ProductCommentMapper.convertToResponse(e)));
+    }
+}

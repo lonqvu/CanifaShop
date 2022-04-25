@@ -15,6 +15,10 @@ class ProductService {
         return http.get(URL_GUEST + "/detail/"+productSeo);
     }
 
+    getComment(id, page){
+        return http.get(URL_GUEST+"/comment/"+id+"/?page="+page);
+    }
+
     //Admin
     getProductsPagingAdmin(page, keyword) {
         return http.get(URL_ADMIN + "?page=" + page + "&keyword=" + keyword);

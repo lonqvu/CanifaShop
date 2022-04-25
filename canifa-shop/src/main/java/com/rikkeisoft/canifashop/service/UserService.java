@@ -8,6 +8,7 @@ import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
 import com.rikkeisoft.canifashop.repository.ProductRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import com.rikkeisoft.canifashop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 
 public interface UserService {
 
@@ -61,6 +63,8 @@ public interface UserService {
 	boolean hasUsername(String username);
 
 	ProductEntity EntityById(Long id);
+
+
 }
 
 @Service
@@ -71,7 +75,8 @@ class UserServiceImpl implements UserService {
 	public final PasswordEncoder passwordEncoder;
 	public final RoleRepository roleRepository;
 	public final EmailService emailService;
-
+	private final HttpServletRequest httpServletRequest;
+	private final AuthenticationManager authenticationManager;
 
 	@Override
 	public void createAdmin(UserEntity entity) {
@@ -85,6 +90,8 @@ class UserServiceImpl implements UserService {
 	public ProductEntity EntityById(Long id) {
 		return productRepository.findById(id).orElse(null);
 	}
+
+
 
 	@Override
 	public UserResponse createUser(SignupRequest request) {

@@ -3,8 +3,11 @@ package com.rikkeisoft.canifashop.presentation.controller.user;
 import com.rikkeisoft.canifashop.base.BaseController;
 import com.rikkeisoft.canifashop.base.BasePagerData;
 import com.rikkeisoft.canifashop.base.BaseResponseEntity;
+import com.rikkeisoft.canifashop.presentation.request.ProductCommentRequest;
+import com.rikkeisoft.canifashop.presentation.response.ProductCommentResponse;
 import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
 import com.rikkeisoft.canifashop.service.FileImageService;
+import com.rikkeisoft.canifashop.service.ProductCommentService;
 import com.rikkeisoft.canifashop.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class ProductController extends BaseController {
 
 	private final ProductService productService;
 	private final FileImageService fileImageService;
+	private final ProductCommentService productCommentService;
 
 	@GetMapping("/products/search")
 	public ResponseEntity<BasePagerData<ProductResponse>> getProductsByKeyword(
@@ -40,7 +44,6 @@ public class ProductController extends BaseController {
 		return ResponseEntity
 				.ok(productService.getProductsByKeyword(page, PAGE_SIZE, search, priceMin, priceMax, categoryId));
 	}
-
 	@GetMapping("/products/hot")
 	public ResponseEntity<BaseResponseEntity> getProductsByHot() {
 		return success(productService.getByHot(), "Get list products hot successful");
@@ -73,5 +76,21 @@ public class ProductController extends BaseController {
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
 				.body(resource);
 	}
+
+//	Comment product
+
+	@PostMapping("/products/{id}/comment")
+	ResponseEntity<BaseResponseEntity> addProductComment(@RequestBody ProductCommentRequest productCommentRequest,
+														 @PathVariable("id") Long id){
+		return success(productCommentService.createComment(productCommentRequest, id), "Add comment successful");
+	}
+	@GetMapping("/products/comment/{id}")
+	ResponseEntity<BasePagerData<ProductCommentResponse>> getProductCommentById(@PathVariable("id") Long id
+			, @RequestParam(name = "page", defaultValue = "0") Integer page){
+		return ResponseEntity.ok(productCommentService.getListComment(page, PAGE_SIZE, id));
+	}
+
+
+
 
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { CardProduct, Container } from '../base'
+import { CardProduct, Container, TextField, SimpleCard } from '../base'
 import {
     Grid,
     Card,
@@ -10,16 +10,27 @@ import {
     ImageList,
     ImageListItem,
     Box,
-    ButtonGroup,
+    Pagination,
     Radio,
     Stack,
     ToggleButton,
     ToggleButtonGroup,
     Link,
+    TableContainer,
+    Table,
+    TableBody,
+    TableRow,
+    Paper,
 } from '@mui/material'
-import { ProductService, localStorageService, URL_IMG } from 'app/services'
+import {
+    ProductService,
+    localStorageService,
+    URL_IMG,
+    AuthService,
+} from 'app/services'
 import { textAlign } from '@mui/system'
 import { Dialog, Notify } from 'app/views/action'
+import { ValidatorForm } from 'react-material-ui-form-validator'
 
 const Item = styled(Card)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -28,41 +39,6 @@ const Item = styled(Card)(({ theme }) => ({
     textAlign: 'center',
     minHeight: '200px',
     color: '#000',
-}))
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    border: '1px solid #ccc',
-    backgroundColor: 'white',
-    marginLeft: 0,
-    width: '100%',
-}))
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}))
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: '12ch',
-            '&:focus': {
-                width: '20ch',
-            },
-        },
-    },
 }))
 
 const Detail = () => {
@@ -81,6 +57,18 @@ const Detail = () => {
     const [listImages, setListImages] = useState([])
 
     const [path, setPath] = useState('')
+    const [page, setPage] = useState(0)
+    const [totalPages, setTotalPages] = useState()
+
+    const handleChangePage = (event, value) => {
+        setPage(value - 1)
+        ProductService.getComment(id, value - 1).then((response) => {
+            setComments(response.data.content)
+            const data = response.data
+            setPage(data.page)
+            setTotalPages(data.totalPages)
+        })
+    }
 
     const [confirmDialog, setConfirmDialog] = useState({
         isOpen: false,
@@ -94,10 +82,71 @@ const Detail = () => {
         type: '',
     })
 
+    const [comments, setComments] = useState([])
+
+    const [auth, setAuth] = useState({})
+    const [id, setId] = useState(0)
+
     useEffect(() => {
         getProductBySeo(productSeo)
+        AuthService.infor()
+            .then((response) => {
+                const data = response.data.data
+                const user = { id: data.id, username: data.username }
+                setAuth(user)
+            })
+            .catch((error) => {
+                const response = error.response
+                setAuth(null)
+                if (
+                    response.status === 401 &&
+                    response.data.message === 'Access is denied'
+                ) {
+                    localStorageService.setItem('accessToken', null)
+                    navigate('/login')
+                }
+            })
     }, [])
 
+    const checkCommentNull = (cm) => {
+        if (cm.length == 0) {
+            return (
+                <div>
+                    <p>Không có bình luận nào</p>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <TableContainer>
+                        <Table
+                            sx={{ minWidth: 700 }}
+                            aria-label="customized table"
+                        >
+                            {cm.map((e) => (
+                                <TableBody key={e.id}>
+                                    <TableRow>
+                                        <Box>
+                                        <p
+                                            style={{
+                                                fontSize: 20,
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            {e.userResponse.username}
+                                        </p>
+                                        <p>{e.content}</p>
+                                        <p>{e.createdAt}</p>
+                                        </Box>
+                                    </TableRow>
+                                </TableBody>
+                            ))}
+                        </Table>
+                    </TableContainer>
+                </div>
+            )
+        }
+    }
     const getProductBySeo = (productSeo) => {
         ProductService.getProductBySeo(productSeo)
             .then((response) => {
@@ -108,6 +157,17 @@ const Detail = () => {
                 setListColors(product.listColors)
                 setSize(listSizes)
                 setListSizes(product.listColors[0].listSizes)
+                setId(response.data.data.id)
+
+                ProductService.getComment(response.data.data.id, page).then(
+                    (response) => {
+                        setComments(response.data.content)
+                        const data = response.data
+                        setPage(data.page)
+                        setTotalPages(data.totalPages)
+                        console.log(response.data.content)
+                    }
+                )
             })
             .catch((error) => {
                 console.log(error)
@@ -186,7 +246,7 @@ const Detail = () => {
                 paddingBottom={7.5}
                 paddingTop={2}
             >
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={12}>
                     <Item sx={{ flexGrow: 1 }}>
                         <Grid
                             container
@@ -379,7 +439,9 @@ const Detail = () => {
                                             variant="contained"
                                             color="inherit"
                                             style={{ width: '100%' }}
-                                            onClick={()=>console.log(product.id)}
+                                            onClick={() =>
+                                                console.log(product.id)
+                                            }
                                         >
                                             Thêm vào sản phẩm yêu thích
                                         </Button>
@@ -388,6 +450,65 @@ const Detail = () => {
                             </Grid>
                         </Grid>
                     </Item>
+                </Grid>
+                <Grid
+                    container
+                    maxWidth="1600px"
+                    margin="auto"
+                    spacing={1}
+                    paddingBottom={7.5}
+                    paddingTop={2}
+                >
+                    <Grid item xs={12}>
+                        <SimpleCard height="auto" title="Bình luận">
+                            <Stack direction="row" justifyContent="start">
+                                <ValidatorForm>
+                                    <TextField
+                                        sx={{
+                                            width: '455px',
+                                            float: 'left',
+                                        }}
+                                        type="text"
+                                        name="stateAddress"
+                                        // value={stateAddress}
+                                        label="Nhập bình luận"
+                                    />
+                                </ValidatorForm>
+                                <Button
+                                    color="success"
+                                    variant="contained"
+                                    type="submit"
+                                    style={{
+                                        height: 50,
+
+                                        marginLeft: 10,
+                                    }}
+                                >
+                                    Gửi
+                                </Button>
+                            </Stack>
+                            {checkCommentNull(comments)}
+
+                            <Stack spacing={2} paddingTop={3} paddingBottom={1}>
+                                <Box
+                                    my={2}
+                                    display="flex"
+                                    justifyContent="center"
+                                >
+                                    <Pagination
+                                        count={totalPages}
+                                        page={page + 1}
+                                        onChange={handleChangePage}
+                                        variant="outlined"
+                                        color="primary"
+                                        showFirstButton
+                                        showLastButton
+                                    />
+                                </Box>
+                            </Stack>
+                        </SimpleCard>
+                    </Grid>
+                    <Grid item xs={12}></Grid>
                 </Grid>
                 <>
                     <Dialog
