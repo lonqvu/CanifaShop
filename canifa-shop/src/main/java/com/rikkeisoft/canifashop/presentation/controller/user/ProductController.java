@@ -3,9 +3,11 @@ package com.rikkeisoft.canifashop.presentation.controller.user;
 import com.rikkeisoft.canifashop.base.BaseController;
 import com.rikkeisoft.canifashop.base.BasePagerData;
 import com.rikkeisoft.canifashop.base.BaseResponseEntity;
+import com.rikkeisoft.canifashop.presentation.request.FavoriteProductRequest;
 import com.rikkeisoft.canifashop.presentation.request.ProductCommentRequest;
 import com.rikkeisoft.canifashop.presentation.response.ProductCommentResponse;
 import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
+import com.rikkeisoft.canifashop.service.FavoriteProductService;
 import com.rikkeisoft.canifashop.service.FileImageService;
 import com.rikkeisoft.canifashop.service.ProductCommentService;
 import com.rikkeisoft.canifashop.service.ProductService;
@@ -32,6 +34,7 @@ public class ProductController extends BaseController {
 	private final ProductService productService;
 	private final FileImageService fileImageService;
 	private final ProductCommentService productCommentService;
+	private final FavoriteProductService favoriteProductService;
 
 	@GetMapping("/products/search")
 	public ResponseEntity<BasePagerData<ProductResponse>> getProductsByKeyword(
@@ -89,8 +92,12 @@ public class ProductController extends BaseController {
 			, @RequestParam(name = "page", defaultValue = "0") Integer page){
 		return ResponseEntity.ok(productCommentService.getListComment(page, PAGE_SIZE, id));
 	}
-
-
+// add list favorite
+@PostMapping("/products/{id}")
+ResponseEntity<BaseResponseEntity> addFavoriteProduct(@RequestBody FavoriteProductRequest favoriteProductRequest,
+													 @PathVariable("id") Long id){
+	return success(favoriteProductService.addListFavoriteProduct(favoriteProductRequest, id), "Add favorite products successful");
+}
 
 
 }

@@ -30,7 +30,7 @@ import lombok.Setter;
 @Table(name = "tbl_users")
 public class UserEntity extends BaseEntity {
 
-	@Column(nullable = true)
+	@Column
 	private String avatar;
 
 	@Column(length = 50, nullable = false, unique = true)
@@ -60,6 +60,9 @@ public class UserEntity extends BaseEntity {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity")
 	private Set<ProductCommentEntity> productCommentEntities;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity")
+	private Set<FavoriteProductEntity> favoriteProductEntities;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity")
 	private Set<OrderEntity> orderEntities;

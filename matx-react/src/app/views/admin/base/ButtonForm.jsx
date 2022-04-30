@@ -25,14 +25,7 @@ const ButtonForm = ({id}) => {
                 size="large"
                 type = "submit"
             
-                // onClick={()=>
-                //     setConfirmDialog({
-                //         isOpen: true,
-                //         title: "Bạn có chắc chắn xóa!",
-                //         subTitle: "Bạn sẽ không thể hoàn tác lại thao tác này!",
-                //         onSubmit:()=>{}
-                //     })
-                // }
+                
                 startIcon={<SaveIcon />}
             >
                 {name(id)}

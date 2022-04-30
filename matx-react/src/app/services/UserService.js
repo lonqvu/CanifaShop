@@ -27,7 +27,6 @@ class UserService {
     getUserAdminById(id) {
         return http.get(URL_ADMIN + "/" + id);
     }
-
     updateUser(username, user) {
         return http.put(URL_USER + "/edit" + "/" + username, user);
     }
@@ -47,6 +46,10 @@ class UserService {
     getOrderDetailsByCode(code) {
         return http.get(URL_CART + "/detail" + "/" + code);
     }
+    updateStatus(orderId, orders){
+        return http.put(URL_USER +"/updateStatus/" + orderId+"?orderStatus="+ orders);
+    }
+    
 
 }
 export default new UserService();

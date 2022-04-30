@@ -12,18 +12,22 @@ import {
     Pagination,
     Stack,
 } from '@mui/material'
+import { styled } from '@mui/system'
 import DialogActions from '@mui/material/DialogActions'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Box } from '@mui/system'
 import { TextField, SimpleCard, StyledTableCell, StyledTableRow } from '../base'
-import { UserService } from 'app/services'
-
+import { UserService,URL_IMG } from 'app/services'
+const IMG = styled('img')(() => ({
+    width: 75,
+}))
 export default function OrderDetail(props) {
     const code = props.code
     const [open, setOpen] = useState(false)
     const [stateOrderDetai, setStateOrderDetail] = useState({})
     const [listProductOrders, setListProductOrders] = useState([])
+
 
     const handleClickOpen = () => {
         setOpen(true)
@@ -33,7 +37,14 @@ export default function OrderDetail(props) {
     const handleClose = () => {
         setOpen(false)
     }
-
+    const ButtonCustom = styled(Button)(({ theme }) => ({
+        color: theme.palette.text.primary,
+        textTransform: 'uppercase',
+        fontWeight: '500',
+        width: 135,
+        marginBottom: 5,
+        display: 'flex',
+    }))
     const getOrderByCode = () => {
         UserService.getOrderDetailsByCode(code)
             .then((response) => {
@@ -46,9 +57,13 @@ export default function OrderDetail(props) {
             })
     }
 
+    //show button
+
+
+
     return (
         <div>
-            <Button
+            <ButtonCustom
                 onClick={handleClickOpen}
                 type="button"
                 variant="contained"
@@ -56,7 +71,8 @@ export default function OrderDetail(props) {
                 className="butMUI-update"
             >
                 <Icon>visibility</Icon>
-            </Button>
+            </ButtonCustom>
+            
             <Dialog
                 open={open}
                 onClose={handleClose}
@@ -70,12 +86,15 @@ export default function OrderDetail(props) {
                 }}
             >
                 <DialogTitle>Chi tiết đơn hàng</DialogTitle>
-                <Box width="auto" margin='20px' overflow="auto">
+                <Box width="auto" margin="20px" overflow="auto">
                     {/* {Mot table} */}
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 700 }}>
                             <TableHead>
                                 <TableRow>
+                                <StyledTableCell align="center">
+                                        Hình ảnh
+                                    </StyledTableCell>
                                     <StyledTableCell align="center">
                                         Sản phẩm
                                     </StyledTableCell>
@@ -94,16 +113,30 @@ export default function OrderDetail(props) {
                                 {listProductOrders.map((order) => (
                                     <StyledTableRow key={order.id}>
                                         <StyledTableCell align="center">
+                                            <IMG src={URL_IMG + order.avatar} />
+                                        </StyledTableCell>
+                                        <StyledTableCell align="center">
                                             {order.name}
                                         </StyledTableCell>
                                         <StyledTableCell align="center">
-                                            {order.price}
+                                            {order.price.toLocaleString(
+                                                'vi-VN',
+                                                {
+                                                    style: 'currency',
+                                                    currency: 'VND',
+                                                }
+                                            )}
                                         </StyledTableCell>
                                         <StyledTableCell align="center">
                                             {order.quantity}
                                         </StyledTableCell>
                                         <StyledTableCell align="center">
-                                            {order.total}
+                                            {(
+                                                order.price * order.quantity
+                                            ).toLocaleString('vi-VN', {
+                                                style: 'currency',
+                                                currency: 'VND',
+                                            })}
                                         </StyledTableCell>
                                     </StyledTableRow>
                                 ))}

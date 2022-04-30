@@ -1,13 +1,10 @@
 package com.rikkeisoft.canifashop.presentation.controller.user;
 
+import com.rikkeisoft.canifashop.service.FileImageService;
+import com.rikkeisoft.canifashop.service.OrderService;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.rikkeisoft.canifashop.base.BaseController;
 import com.rikkeisoft.canifashop.base.BaseResponseEntity;
@@ -15,6 +12,9 @@ import com.rikkeisoft.canifashop.presentation.request.UserRequest;
 import com.rikkeisoft.canifashop.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.mail.MessagingException;
 
 @CrossOrigin(origins = "${domain.origins}")
 @RestController
@@ -23,6 +23,10 @@ import lombok.RequiredArgsConstructor;
 public class UserController extends BaseController {
 
 	public final UserService userService;
+
+	private final FileImageService fileImageService;
+
+	private final OrderService orderService;
 
 	@PutMapping("/edit/{username}")
 	public ResponseEntity<BaseResponseEntity> updateUser(@PathVariable("username") String username,
@@ -40,5 +44,18 @@ public class UserController extends BaseController {
 	@GetMapping("/{username}")
 	public ResponseEntity<BaseResponseEntity> getUserByUsername(@PathVariable("username") String username) {
 		return success(userService.getUserByUsername(username), "Get user successful");
+	}
+
+	@PostMapping("/uploadfile/{id}")
+	public ResponseEntity<BaseResponseEntity> uploadFile(@PathVariable("id") Long id,
+														 @RequestParam("avatar") MultipartFile avatar) {
+
+		return created(fileImageService.storeFileUser(id, avatar), "Create images of product successful");
+	}
+
+	@PutMapping("updateStatus/{id}")
+	public ResponseEntity<BaseResponseEntity> updateStatus(@PathVariable Long id,
+														   @RequestParam("orderStatus") Integer orderStatus) throws MessagingException {
+		return success(orderService.updateOrderStatus(id, orderStatus), "Update status order successful");
 	}
 }

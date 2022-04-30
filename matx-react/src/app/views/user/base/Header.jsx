@@ -35,7 +35,7 @@ const TopbarContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    maxWidth: '1300px',
+    maxWidth: '1600px',
     margin: 'auto',
     [theme.breakpoints.down('sm')]: {
         paddingLeft: 16,

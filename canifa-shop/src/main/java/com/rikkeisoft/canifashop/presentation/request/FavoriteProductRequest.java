@@ -7,8 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductCommentRequest {
-    private String content;
+public class FavoriteProductRequest {
     private Long userId;
     private Long productId;
 }

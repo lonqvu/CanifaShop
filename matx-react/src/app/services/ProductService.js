@@ -52,6 +52,12 @@ class ProductService {
         }
         return http.post(URL_ADMIN + '/' + 'uploadfile' + '/' + productId, formData)
     }
+    createComment(productId, product){
+        return http.post(URL_GUEST + "/" + productId+"/comment", product);
+    }
+    createFavotite(productId, product){
+        return http.post(URL_GUEST+"/" + productId, product);
+    }
 
 }
 export default new ProductService()

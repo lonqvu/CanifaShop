@@ -11,6 +11,10 @@ import java.util.HashSet;
 
 import javax.transaction.Transactional;
 
+import com.rikkeisoft.canifashop.entity.UserEntity;
+import com.rikkeisoft.canifashop.presentation.mapper.UserMapper;
+import com.rikkeisoft.canifashop.presentation.response.UserResponse;
+import com.rikkeisoft.canifashop.repository.UserRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,8 @@ public interface FileImageService {
 
 	ProductResponse storeFile(Long id, MultipartFile avatar, MultipartFile[] images);
 
+	UserResponse storeFileUser(Long id, MultipartFile avatar);
+
 	Resource loadFileAsResource(String pathFile);
 
 }
@@ -47,6 +53,10 @@ class FileImageServiceImpl implements FileImageService {
 	private final ProductService productService;
 
 	private final Path root = Paths.get("uploads");
+
+	private final UserService userService;
+
+	private final UserRepository userRepository;
 
 	@Override
 	@Transactional
@@ -119,6 +129,56 @@ class FileImageServiceImpl implements FileImageService {
 			}
 
 			new File(root + "/" + entity.getId() + "/avatar").mkdirs();
+
+			Path targetLocation = this.root.resolve(path);
+			Files.copy(avatar.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+		} catch (IOException ex) {
+			throw new FileStorageException("Could not store file " + path + ". Please try again!");
+		}
+	}
+
+	@Override
+	@Transactional
+	public UserResponse storeFileUser(Long id, MultipartFile avatar) {
+
+		UserEntity entity = userService.getEntityById(id);
+
+		if (entity != null) {
+
+			String newFile = StringUtils.cleanPath(avatar.getOriginalFilename());
+
+			String newAvatar = id + "/avatarUser/" + newFile; // Tạo path lưu cho Avatar
+
+			// Lưu Avatar
+			if (!isEmptyUploadFile(avatar)) {
+				if (entity.getAvatar() != null) { // Nếu có ảnh trong product => xóa path ảnh đi vào cập nhật lại
+					if (this.delete(id + "/avatarUser/")) {
+						createImageAvatarUser(entity, newAvatar, avatar);
+					}
+				} else {
+					createImageAvatarUser(entity, newAvatar, avatar);
+				}
+				createImageAvatarUser(entity, newAvatar, avatar);
+			}
+
+
+
+			userRepository.save(entity);
+			return UserMapper.convertToResponse(entity);
+		} else {
+			return null;
+		}
+	}
+
+	private void createImageAvatarUser(UserEntity entity, String path, MultipartFile avatar) {
+		try {
+			entity.setAvatar(path);
+			if (path.contains("..")) {
+				throw new FileStorageException("Sorry! Filename contains invalid path sequence " + path);
+			}
+
+			new File(root + "/" + entity.getId() + "/avatarUser").mkdirs();
 
 			Path targetLocation = this.root.resolve(path);
 			Files.copy(avatar.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);

@@ -60,6 +60,8 @@ public class ProductEntity extends BaseEntity {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "productEntity")
 	private Set<ProductDetailEntity> productDetailEntities;
 
+
+
 	public void addProductDetailEntity(ProductDetailEntity productDetailEntity) {
 		this.productDetailEntities.add(productDetailEntity);
 		productDetailEntity.setProductEntity(this);
@@ -69,6 +71,12 @@ public class ProductEntity extends BaseEntity {
 		this.productDetailEntities.remove(productDetailEntity);
 		productDetailEntity.setProductEntity(null);
 	}
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "productEntity")
+	private Set<FavoriteProductEntity> favoriteProductEntities;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "productEntity")
+	private Set<ProductCommentEntity> productCommentEntities;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "productEntity")
 	private Set<ProductImageEntity> productImagesEntities;

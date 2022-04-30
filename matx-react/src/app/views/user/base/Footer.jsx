@@ -12,6 +12,7 @@ const Footer = () => {
           <Box
             bgcolor="text.secondary"
             color="white"
+            
           >
             <Container maxWidth="lg">
               <Grid container spacing={5}>

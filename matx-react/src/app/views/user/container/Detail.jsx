@@ -20,7 +20,7 @@ import {
     Table,
     TableBody,
     TableRow,
-    Paper,
+    Avatar,
 } from '@mui/material'
 import {
     ProductService,
@@ -126,17 +126,55 @@ const Detail = () => {
                             {cm.map((e) => (
                                 <TableBody key={e.id}>
                                     <TableRow>
-                                        <Box>
-                                        <p
-                                            style={{
-                                                fontSize: 20,
-                                                fontWeight: 500,
+                                        <Box
+                                            sx={{
+                                                backgroundColor: '',
+                                                padding: 2,
+                                                border: "1px solid black",
+                                                borderRadius: 10,
+                                                marginBottom: 2,
                                             }}
                                         >
-                                            {e.userResponse.username}
-                                        </p>
-                                        <p>{e.content}</p>
-                                        <p>{e.createdAt}</p>
+                                            <Stack direction="row" spacing={2}>
+                                                <Avatar
+                                                    alt="Remy Sharp"
+                                                    src={
+                                                        URL_IMG +
+                                                        e.userResponse.avatar
+                                                    }
+                                                />
+                                                <p
+                                                    style={{
+                                                        marginLeft: 15,
+                                                        fontSize: 15,
+                                                    }}
+                                                >
+                                                    {e.userResponse.username}
+                                                    <p
+                                                        style={{
+                                                            fontSize: 12,
+                                                            opacity: '50%',
+                                                        }}
+                                                    >
+                                                        {e.createdAt}
+                                                    </p>
+                                                </p>
+                                            </Stack>
+                                            <Stack
+                                                direction="row"
+                                                spacing={2}
+                                                style={{ marginLeft: 55 }}
+                                            >
+                                                <p>{e.content}</p>
+                                            </Stack>
+                                            <Stack direction="row" spacing={2}>
+                                                <Button type="button">
+                                                    Sửa
+                                                </Button>
+                                                <Button type="button">
+                                                    Xóa
+                                                </Button>
+                                            </Stack>
                                         </Box>
                                     </TableRow>
                                 </TableBody>
@@ -462,7 +500,7 @@ const Detail = () => {
                     <Grid item xs={12}>
                         <SimpleCard height="auto" title="Bình luận">
                             <Stack direction="row" justifyContent="start">
-                                <ValidatorForm>
+                                {/* <ValidatorForm>
                                     <TextField
                                         sx={{
                                             width: '455px',
@@ -480,15 +518,13 @@ const Detail = () => {
                                     type="submit"
                                     style={{
                                         height: 50,
-
                                         marginLeft: 10,
                                     }}
                                 >
                                     Gửi
-                                </Button>
+                                </Button> */}
                             </Stack>
                             {checkCommentNull(comments)}
-
                             <Stack spacing={2} paddingTop={3} paddingBottom={1}>
                                 <Box
                                     my={2}

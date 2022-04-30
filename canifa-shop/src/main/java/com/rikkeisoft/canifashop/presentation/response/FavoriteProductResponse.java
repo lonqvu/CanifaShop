@@ -1,6 +1,5 @@
 package com.rikkeisoft.canifashop.presentation.response;
 
-import com.rikkeisoft.canifashop.base.BaseResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,9 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class ProductComment1Reponse extends BaseResponse {
-    private String content;
-    private Long parenId;
+public class FavoriteProductResponse {
     private UserResponse userResponse;
     private ProductResponse productResponse;
     private String createdBy;

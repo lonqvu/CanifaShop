@@ -7,14 +7,12 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "tbl_comments")
-public class ProductCommentEntity extends BaseEntity {
-    @Column(name = "content", columnDefinition = "text",length = 45, nullable = true)
-    private String content;
+@Table(name = "tbl_favorite")
+public class FavoriteProductEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;

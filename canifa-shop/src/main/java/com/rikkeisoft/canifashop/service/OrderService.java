@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -56,11 +57,12 @@ class OrderServiceImpl implements OrderService {
 	private final PromotionRepository promotionRepository;
 	private final UserRepository userRepository;
 	private final ProductDetailRepository productDetailRepository;;
+	private final ProductService productService;
 
 	@Override
 	public BasePagerData<OrderResponse> getOrdersByPaging(Integer page, Integer size, String keyword) {
 
-		Pageable paging = PageRequest.of(page, size);
+		Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
 
 		if (keyword.equals("-1") || keyword.isEmpty()) {
 			keyword = null;
@@ -110,7 +112,8 @@ class OrderServiceImpl implements OrderService {
 		orderRequest.getListOrderDetailsRequest().forEach(id -> {
 			ProductDetailEntity productDetailEntity = productDetailRepository.findByListId(id.getColorId(),
 					id.getProductId(), id.getSizeId());
-			OrderDetailEntity orderDetailEntity = OrderDetailEntity.builder().quantity(id.getQuantity())
+			ProductEntity productEntity = productService.getEntityById(id.getProductId());
+			OrderDetailEntity orderDetailEntity = OrderDetailEntity.builder().avatar(productEntity.getAvatar()).quantity(id.getQuantity())
 					.productDetailEntity(productDetailEntity).price(BigDecimal.valueOf(5.4)).build();
 			orderEntity.addOrderDetailEntity(orderDetailEntity);
 		});

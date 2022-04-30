@@ -4,11 +4,12 @@ import {
 } from 'react-router-dom';
 import { SimpleCard } from 'app/components'
 import SaveIcon from '@mui/icons-material/Save';
-import { Box } from '@mui/system'
+import { Box,styled } from '@mui/system'
 import { Grid } from '@mui/material'
 import { ValidatorForm } from 'react-material-ui-form-validator'
 import { Container, TextField, StyledTableRow, StyledTableCell, ButtonForm } from '../../base'
 import { OrderService } from 'app/services'
+import { ProductService, URL_IMG } from 'app/services'
 import '../../../../css/Module.css'
 import {
     Table,
@@ -21,6 +22,9 @@ import {
     Paper,
     
 } from '@mui/material'
+const IMG = styled('img')(() => ({
+    width: 75,
+}))
 const AppForm = () => {
     const [status, setStatus] = useState('')
     const [orders, setOrders] = useState([])
@@ -118,6 +122,7 @@ const AppForm = () => {
                                 <TableHead>
                                     <TableRow>
                                         <StyledTableCell align="center" width="50px">STT</StyledTableCell>
+                                        <StyledTableCell align="center">Hình ảnh</StyledTableCell>
                                         <StyledTableCell align="center">Tên sản phẩm</StyledTableCell>
                                         <StyledTableCell align="center">Size</StyledTableCell>
                                         <StyledTableCell align="center">Màu</StyledTableCell>
@@ -131,6 +136,7 @@ const AppForm = () => {
                                     {listOrders.map((order, index) => (
                                         <StyledTableRow key={order}>
                                             <StyledTableCell align="center">{++index}</StyledTableCell>
+                                            <StyledTableCell align="center"><IMG src={URL_IMG + order.avatar} /></StyledTableCell>
                                             <StyledTableCell align="center">{order.name}</StyledTableCell>
                                             <StyledTableCell align="center">{order.size}</StyledTableCell>
                                             <StyledTableCell align="center">{order.color}</StyledTableCell>

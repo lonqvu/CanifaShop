@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,12 +40,6 @@ class ProductCommentServiceImpl implements ProductCommentService{
             throw new BadRequestException("Product does not exist");
         }
         ProductCommentEntity productCommentEntity = ProductCommentMapper.convertToEntity(productCommentRequest);
-        if(productCommentEntity.getParentId() != null && !productCommentRepository.existsById(productCommentRequest.getParenId())){
-            throw new BadRequestException("ParentId Product does not exist");
-        }
-        if(productCommentEntity.getParentId() == null){
-            productCommentEntity.setParentId(0L);
-        }
         UserEntity userEntity = userService.getEntityById(productCommentRequest.getUserId());
         productCommentEntity.setProductEntity(productEntity);
         productCommentEntity.setUserEntity(userEntity);
@@ -63,7 +58,7 @@ class ProductCommentServiceImpl implements ProductCommentService{
 
     @Override
     public BasePagerData<ProductCommentResponse> getListComment(Integer page, Integer size, Long id) {
-        Pageable paging = PageRequest.of(page, size);
+        Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
         Page<ProductCommentEntity> pageResult = productCommentRepository.findByProductId(id, paging);
         return BasePagerData.build(pageResult.map(e -> ProductCommentMapper.convertToResponse(e)));
     }

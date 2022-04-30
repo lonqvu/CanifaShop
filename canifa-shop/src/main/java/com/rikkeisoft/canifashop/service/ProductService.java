@@ -190,16 +190,6 @@ class ProductServiceImpl implements ProductService {
 		}
 	}
 
-//	@Override
-//	public ProductResponse listFavourite(ProductRequest productRequest) {
-//		UserEntity userEntity = this.getUserEntityById(productRequest.getUserId());
-//		ProductEntity productEntity = ProductMapper.convertToEntity(productRequest);
-//		productEntity.setSeo(new Slugify().slugify(productRequest.getName()));
-//		if(userEntity!=null){
-//			productEntity.setUserEntities(userEntity);
-//		}
-//		return ProductMapper.convertToResponse(productRepository.save(productEntity));
-//	}
 
 	private void createProductDetail(ProductEntity product, List<ColorSizeRequest> listColors) {
 		product.setProductDetailEntities(new HashSet<>());

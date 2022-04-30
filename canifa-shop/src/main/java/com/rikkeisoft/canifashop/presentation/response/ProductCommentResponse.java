@@ -17,9 +17,7 @@ import java.util.List;
 @SuperBuilder
 public class ProductCommentResponse extends BaseResponse{
     private String content;
-    private Long parenId;
     private UserResponse userResponse;
     private ProductResponse productResponse;
-    private List<ProductComment1Reponse> productComment1Reponses;
     private String createdBy;
 }

@@ -8,6 +8,7 @@ const Product = Loadable(lazy(() => import("./Product")));
 const Detail = Loadable(lazy(() => import("./Detail")));
 const Cart = Loadable(lazy(() => import("./Cart")));
 const Profile = Loadable(lazy(() => import("./Profile")));
+const Evaluate = Loadable(lazy(() => import("./ProductComment")));
 
 
 const Root = styled('div')(() => ({
@@ -61,6 +62,16 @@ const Routes = [
             <Root>
                 <Header />
                 <Profile />
+                <Footer />
+            </Root>
+        )
+    },
+    {
+        path: '/evaluate/:productId',
+        element: (
+            <Root>
+                <Header />
+                <Evaluate />
                 <Footer />
             </Root>
         )

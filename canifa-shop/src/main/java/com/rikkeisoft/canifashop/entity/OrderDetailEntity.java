@@ -26,6 +26,9 @@ import lombok.Setter;
 @Table(name = "tbl_order_details")
 public class OrderDetailEntity extends BaseEntity {
 
+	@Column(name = "avatar", nullable = true)
+	private String avatar;
+
 	@Column(name = "quantity", nullable = false)
 	private int quantity;
 
