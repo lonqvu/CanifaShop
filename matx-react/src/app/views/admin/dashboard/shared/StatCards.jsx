@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { Grid, Card, Icon, IconButton, Tooltip } from '@mui/material'
 import { Box, styled } from '@mui/system'
 import { Small } from 'app/components/Typography'
-import { HomeService, localStorageService } from 'app/services'
+import {
+    HomeService,
+    localStorageService,
+    StatisTicalService,
+} from 'app/services'
 
 const StyledCard = styled(Card)(({ theme }) => ({
     display: 'flex',
@@ -40,32 +44,42 @@ const Heading = styled('h6')(({ theme }) => ({
 }))
 
 const StatCards = () => {
-    const [userNumber, setUserNumber] = useState(0);
-    const [orderNumber, setOrderNumber] = useState(0);
-    const [productNumber, setProductNumber] = useState(0);
-
+    const [userNumber, setUserNumber] = useState(0)
+    const [orderNumber, setOrderNumber] = useState(0)
+    const [productNumber, setProductNumber] = useState(0)
+    const [money, setMoney] = useState([])
     const navigate = useNavigate()
 
     const sumUser = () => {
-        HomeService.getUserSum('users').then((response) => {
-            setUserNumber(response.data);
-        }).catch(error => {
-            const response = error.response
-            if (response.status === 401 && (response.data.message === "Access is denied")) {
-                localStorageService.setItem('accessToken', null)
-                navigate('/login')
-            }
-        })
+        HomeService.getUserSum('users')
+            .then((response) => {
+                setUserNumber(response.data)
+            })
+            .catch((error) => {
+                const response = error.response
+                if (
+                    response.status === 401 &&
+                    response.data.message === 'Access is denied'
+                ) {
+                    localStorageService.setItem('accessToken', null)
+                    navigate('/login')
+                }
+            })
         HomeService.getUserSum('orders').then((response) => {
-            setOrderNumber(response.data);
+            setOrderNumber(response.data)
         })
         HomeService.getUserSum('products').then((response) => {
-            setProductNumber(response.data);
+            setProductNumber(response.data)
         })
+        StatisTicalService.getRevenueByComplete(0, 1672543800000).then(
+            (res) => {
+                setMoney(res.data)
+            }
+        )
     }
 
     useEffect(() => {
-        sumUser();
+        sumUser()
     }, [])
     return (
         <Grid container spacing={3} sx={{ mb: '24px' }}>
@@ -76,10 +90,8 @@ const StatCards = () => {
                         <Box ml="12px">
                             <Small>Người dùng</Small>
                             <Heading>{userNumber}</Heading>
-
                         </Box>
                     </ContentBox>
-
                 </StyledCard>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -87,13 +99,17 @@ const StatCards = () => {
                     <ContentBox>
                         <Icon className="icon">attach_money</Icon>
                         <Box ml="12px">
-                            <Small sx={{ lineHeight: 1 }}>
-                                This week Sales
-                            </Small>
-                            <Heading>{orderNumber}</Heading>
+                            <Small sx={{ lineHeight: 1 }}>Doanh thu</Small>
+                            <Heading>
+                                {money
+                                    .reduce((a, v) => (a = a + v.total), 0)
+                                    .toLocaleString('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                    })}
+                            </Heading>
                         </Box>
                     </ContentBox>
-
                 </StyledCard>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -105,7 +121,6 @@ const StatCards = () => {
                             <Heading>{productNumber}</Heading>
                         </Box>
                     </ContentBox>
-
                 </StyledCard>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -117,7 +132,6 @@ const StatCards = () => {
                             <Heading>{orderNumber}</Heading>
                         </Box>
                     </ContentBox>
-
                 </StyledCard>
             </Grid>
         </Grid>

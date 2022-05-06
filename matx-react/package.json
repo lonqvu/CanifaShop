@@ -6,6 +6,10 @@
         "@auth0/auth0-spa-js": "^1.19.2",
         "@ckeditor/ckeditor5-build-classic": "^33.0.0",
         "@ckeditor/ckeditor5-react": "^4.0.1",
+        "@date-io/date-fns": "^2.13.1",
+        "@date-io/dayjs": "^2.13.1",
+        "@date-io/luxon": "^2.13.1",
+        "@date-io/moment": "^2.13.1",
         "@emotion/react": "^11.5.0",
         "@emotion/styled": "^11.3.0",
         "@mui/icons-material": "^5.1.1",
@@ -20,7 +24,6 @@
         "date-fns": "^2.26.0",
         "echarts": "^5.2.2",
         "echarts-for-react": "^3.0.2",
-        
         "formik": "^2.2.9",
         "jsonwebtoken": "^8.5.1",
         "jwt-decode": "^3.1.2",

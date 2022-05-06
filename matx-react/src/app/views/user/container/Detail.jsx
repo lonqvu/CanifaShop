@@ -59,6 +59,10 @@ const Detail = () => {
     const [path, setPath] = useState('')
     const [page, setPage] = useState(0)
     const [totalPages, setTotalPages] = useState()
+    const [comments, setComments] = useState([])
+
+    const [auth, setAuth] = useState({})
+    const [id, setId] = useState(0)
 
     const handleChangePage = (event, value) => {
         setPage(value - 1)
@@ -81,11 +85,6 @@ const Detail = () => {
         message: '',
         type: '',
     })
-
-    const [comments, setComments] = useState([])
-
-    const [auth, setAuth] = useState({})
-    const [id, setId] = useState(0)
 
     useEffect(() => {
         getProductBySeo(productSeo)
@@ -130,7 +129,7 @@ const Detail = () => {
                                             sx={{
                                                 backgroundColor: '',
                                                 padding: 2,
-                                                border: "1px solid black",
+                                                border: '1px solid black',
                                                 borderRadius: 10,
                                                 marginBottom: 2,
                                             }}

@@ -200,6 +200,7 @@ export default function Valuate(props) {
     const [productId, setProductId] = useState([])
     const [selected, setSelected] = React.useState(() => [])
     const [colors, setColor] = useState('black')
+    const [images, setImages] = useState([])
     const [notify, setNotify] = useState({
         isOpen: false,
         message: '',
@@ -222,23 +223,33 @@ export default function Valuate(props) {
     }))
     const CreateComment = (e) => {
         e.preventDefault()
-        const comment = { userId, content }
+        const comment = { userId, content}
         const favorite = { userId }
-        console.log(selected)
         selected.map((x) =>
             ProductService.createFavotite(x, favorite).then((response) => {})
         )
         listProductOrders.map((e) =>
             ProductService.createComment(e.id, comment)
                 .then((response) => {
-                    setNotify({
-                        isOpen: true,
-                        message: 'Đánh giá thành công, vui lòng chờ!',
-                        type: 'success',
-                    })
-                    window.setTimeout(function () {
-                        setOpen(false)
-                    }, 1000)
+                        ProductService.createOrUpdateImageComment(response.data.data.id, images).then((re)=>{
+                            setNotify({
+                                isOpen: true,
+                                message: 'Đánh giá thành công, vui lòng chờ!',
+                                type: 'success',
+                            })
+                            window.setTimeout(function () {
+                                setOpen(false)
+                            }, 1000)
+                        })
+                        .catch((error) => {
+                            console.log(error)
+                            setNotify({
+                                isOpen: true,
+                                message: 'Tạo thất bại!',
+                                type: 'error',
+                            })
+                        })
+                    
                 })
                 .catch((error) => {
                     console.log(error)
@@ -249,6 +260,9 @@ export default function Valuate(props) {
                     })
                 })
         )
+    }
+    const handleMutipleAvatar = (e) => {
+        setImages(e.target.files)
     }
     const getOrderByCode = () => {
         UserService.getOrderDetailsByCode(code)
@@ -327,6 +341,9 @@ export default function Valuate(props) {
                                         Sản phẩm
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
+                                       Phân loại
+                                    </StyledTableCell>
+                                    <StyledTableCell align="center">
                                         Giá bán
                                     </StyledTableCell>
                                     <StyledTableCell align="center">
@@ -348,7 +365,12 @@ export default function Valuate(props) {
                                         </StyledTableCell>
                                         <StyledTableCell align="center">
                                             {order.name}
+
                                         </StyledTableCell>
+                                        <StyledTableCell align="center">
+                                        <p>Màu: {order.color}</p>
+                                        <p>Size: {order.size}</p>
+                                    </StyledTableCell>
                                         <StyledTableCell align="center">
                                             {order.price.toLocaleString(
                                                 'vi-VN',
@@ -415,9 +437,15 @@ export default function Valuate(props) {
                                             'Vui lòng nhập ý kiến đóng góp cho sản phẩm',
                                         ]}
                                     />
+                                    <input
+                                    type="file"
+                                    multiple
+                                    onChange={handleMutipleAvatar}
+                                    
+                                />
                                 </Grid>
                             </Grid>
-
+                            <br></br>
                             <Button
                                 color="success"
                                 variant="contained"

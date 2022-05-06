@@ -24,7 +24,9 @@ public interface ProductCommentService {
     ProductCommentResponse createComment(ProductCommentRequest productCommentRequest, Long id);
     ProductCommentResponse editComment(ProductCommentRequest productCommentRequest, Long id);
     ProductCommentResponse deleteComment(ProductCommentRequest productCommentRequest, Long id);
+    ProductCommentEntity getEntityById(Long id);
     BasePagerData<ProductCommentResponse> getListComment(Integer page, Integer size, Long id);
+    BasePagerData<ProductCommentResponse> getListCommentByUser(Integer page, Integer size, Long id);
 }
 @Service
 @RequiredArgsConstructor
@@ -57,9 +59,22 @@ class ProductCommentServiceImpl implements ProductCommentService{
     }
 
     @Override
+    public ProductCommentEntity getEntityById(Long id) {
+        ProductCommentEntity productCommentEntity = productCommentRepository.findById(id).get();
+        return productCommentEntity;
+    }
+
+    @Override
     public BasePagerData<ProductCommentResponse> getListComment(Integer page, Integer size, Long id) {
         Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
         Page<ProductCommentEntity> pageResult = productCommentRepository.findByProductId(id, paging);
+        return BasePagerData.build(pageResult.map(e -> ProductCommentMapper.convertToResponse(e)));
+    }
+
+    @Override
+    public BasePagerData<ProductCommentResponse> getListCommentByUser(Integer page, Integer size, Long id) {
+        Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
+        Page<ProductCommentEntity> pageResult = productCommentRepository.findByUserId(id, paging);
         return BasePagerData.build(pageResult.map(e -> ProductCommentMapper.convertToResponse(e)));
     }
 }

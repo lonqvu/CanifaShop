@@ -11,9 +11,14 @@ import com.rikkeisoft.canifashop.repository.FavoriteProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 public interface FavoriteProductService {
     FavoriteProductResponse addListFavoriteProduct(FavoriteProductRequest favoriteProductRequest, Long id);
+    List<FavoriteProductResponse> getListFavoriteProduct();
+    Boolean checkFavorite(Long id);
 }
 @Service
 @RequiredArgsConstructor
@@ -24,7 +29,7 @@ class FavoriteProductImpl implements FavoriteProductService{
     @Override
     public FavoriteProductResponse addListFavoriteProduct(FavoriteProductRequest favoriteProductRequest, Long id) {
         ProductEntity productEntity = productService.getEntityById(id);
-        if(productEntity == null || !favoriteProductRepository.existsById(id)){
+        if(productEntity == null){
             throw new BadRequestException("product doesn't exist");
         }
         FavoriteProductEntity favoriteProductEntity = FavoriteProductMapper.convertToEntity(favoriteProductRequest);
@@ -32,5 +37,22 @@ class FavoriteProductImpl implements FavoriteProductService{
         favoriteProductEntity.setProductEntity(productEntity);
         favoriteProductEntity.setUserEntity(userEntity);
         return FavoriteProductMapper.convertToResponse(favoriteProductRepository.save(favoriteProductEntity));
+    }
+
+    @Override
+    public List<FavoriteProductResponse> getListFavoriteProduct() {
+        List<FavoriteProductEntity> favoriteProductEntities = favoriteProductRepository.findAll();
+        return favoriteProductEntities.stream().map(e->FavoriteProductMapper.convertToResponse(e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean checkFavorite(Long id) {
+        List<FavoriteProductEntity> list = favoriteProductRepository.findAll();
+        for (FavoriteProductEntity list1 : list) {
+            if(id == list1.getProductEntity().getId()){
+                return true;
+            }
+        }
+        return false;
     }
 }

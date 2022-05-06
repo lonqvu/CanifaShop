@@ -20,6 +20,7 @@ import {
     TableContainer,
     Paper,
     Tab,
+    Autocomplete,
     Tabs,
     Typography,
     Button,
@@ -36,8 +37,9 @@ import {
 } from '@mui/material'
 import { OrderDetail } from 'app/views/user/base'
 import Valuate from './ProductComment'
-import { OrderService } from 'app/services'
+import { UserAddressService } from 'app/services'
 import { Notify, AlertDialog, showError } from 'app/views/action'
+import MyValuate from './MyEvaluate'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props
@@ -109,6 +111,8 @@ export default function VerticalTabs() {
     const [stateInfor, setStateInfor] = useState({})
     const [stateOrder, setStateOrder] = useState([])
     const [stateStatus, setStateStatus] = useState(4)
+    const [detailAddress, setDetailAddress] = useState()
+    const [listAddress, setListAddress] = useState([])
     const [orderStatus, setStatus] = useState(0)
     const [id, setId] = useState('')
     const [confirmDialog, setConfirmDialog] = useState({
@@ -136,6 +140,10 @@ export default function VerticalTabs() {
     }
 
     useEffect(() => {
+        UserAddressService.getAddressByUsername(username).then((response)=>{
+            setListAddress(response.data.data)
+            // setAddress()
+        })
         UserService.getUserByUsername(username)
             .then((response) => {
                 const user = response.data.data
@@ -162,12 +170,17 @@ export default function VerticalTabs() {
 
     ///////////////////////////////////////////  địa chỉ
 
+    const setNameAddress = (id)=>{
+        
+    }
+
     const setAddress = (city, district, ward) => {
         if (city) {
             setListDistrict(
-                dataVietNam.district.filter((d) => d.idCity === city.idCity)
+                dataVietNam.district.filter((d) => d.idCity === city)
             )
             setCity(city)
+           console.log(city.name)
         }
 
         if (district) {
@@ -187,6 +200,7 @@ export default function VerticalTabs() {
     ///////////////////////////////////////////  đổi mật khẩu
 
     useEffect(() => {
+        
         ValidatorForm.addValidationRule('isPasswordMatch', (value) => {
             console.log(value)
 
@@ -243,18 +257,15 @@ export default function VerticalTabs() {
                             variant="contained"
                             color="success"
                             className="butMUI-update"
-                           
+                            onClick={() => {
+                                setStatus(2)
+                                setId(x)
+                            }}
                         >
                             Hoàn thành
                         </ButtonCustom>
-                        <button type="button" className="Button button-create is-red"  onClick={() => {
-                                setStatus(2)
-                                setId(x)
-                            }}>
-        CREATE LISTING
-      </button>
+                        
                     </ValidatorForm>
-                    {/* <Valuate code={e.code}></Valuate> */}
                 </div>
             )
         } else if (e.orderStatus == 'Chờ xác nhận') {
@@ -287,7 +298,7 @@ export default function VerticalTabs() {
         }
     }
     const updateStatus = (event) => {
-        event.preventDefault();
+        event.preventDefault()
         const sta = { orderStatus }
         const status = ''
         UserService.updateStatus(id, orderStatus)
@@ -357,6 +368,7 @@ export default function VerticalTabs() {
                             <Tab label="Địa chỉ" {...a11yProps(1)} />
                             <Tab label="Đổi mật khẩu" {...a11yProps(2)} />
                             <Tab label="Đơn hàng của tôi" {...a11yProps(3)} />
+                            <Tab label="Đánh giá" {...a11yProps(4)} />
                         </Tabs>
                         <TabPanel value={value} index={0}>
                             <SimpleCard title={'Thông tin của tôi'}>
@@ -446,9 +458,165 @@ export default function VerticalTabs() {
                         <TabPanel value={value} index={1}>
                             <SimpleCard title="Địa chỉ của tôi">
                                 <ValidatorForm
-                                    onSubmit={() => null}
+                                    onSubmit={updatePassword}
                                     onError={() => null}
-                                ></ValidatorForm>
+                                >
+                                    <Grid container spacing={6}>
+                                        <Grid
+                                            item
+                                            lg={12}
+                                            md={12}
+                                            sm={12}
+                                            xs={12}
+                                            sx={{ mt: 2 }}
+                                        >
+                                            <SimpleCard title="Danh sách danh mục">
+                                                <Box
+                                                    width="100%"
+                                                    overflow="auto"
+                                                >
+                                                    <TableContainer
+                                                        component={Paper}
+                                                    >
+                                                        <Table
+                                                            sx={{
+                                                                minWidth: 700,
+                                                            }}
+                                                            aria-label="customized table"
+                                                        >
+                                                            <TableHead>
+                                                                <TableRow>
+                                                                    <StyledTableCell
+                                                                        align="center"
+                                                                        width="50px"
+                                                                    >
+                                                                        STT
+                                                                    </StyledTableCell>
+                                                                    <StyledTableCell align="center">
+                                                                        Tỉnh/Thành phố
+                                                                    </StyledTableCell>
+                                                                    <StyledTableCell align="center">
+                                                                        Quận/ Huyện
+                                                                    </StyledTableCell>
+                                                                    <StyledTableCell
+                                                                        align="center"
+                                                                        width="175px"
+                                                                    >
+                                                                       Xã/Phường
+                                                                    </StyledTableCell>
+                                                                </TableRow>
+                                                            </TableHead>
+                                                            <TableBody>
+                                                                {listAddress.map(
+                                                                    (
+                                                                        address, index
+                                                                    ) => (
+                                                                        <StyledTableRow
+                                                                            key={
+                                                                                address.id
+                                                                            }
+                                                                        >
+                                                                            <StyledTableCell align="center">
+                                                                                {index++}
+                                                                            </StyledTableCell>
+                                                                            <StyledTableCell align="center">
+                                                                                {
+                                                                                    setAddress()
+                                                                                }
+                                                                            </StyledTableCell>
+                                                                            {/* <StyledTableCell align="center">
+                                                                                {displayParent(
+                                                                                    category.parent
+                                                                                )}
+                                                                            </StyledTableCell>
+                                                                            <StyledTableCell align="center">
+                                                                                <Fab
+                                                                                    size="small"
+                                                                                    color="secondary"
+                                                                                    aria-label="Edit"
+                                                                                    className="button"
+                                                                                    onClick={() =>
+                                                                                        navigate(
+                                                                                            '/admin/category/management/' +
+                                                                                                category.id
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <Icon>
+                                                                                        edit
+                                                                                    </Icon>
+                                                                                </Fab>
+                                                                                <Fab
+                                                                                    size="small"
+                                                                                    color="secondary"
+                                                                                    aria-label="Delete"
+                                                                                    className="button"
+                                                                                    onClick={() => {
+                                                                                        setConfirmDialog(
+                                                                                            {
+                                                                                                isOpen: true,
+                                                                                                title: 'Bạn có chắc chắn xóa!',
+                                                                                                subTitle:
+                                                                                                    'Bạn sẽ không thể hoàn tác lại thao tác này!',
+                                                                                                onConfirm:
+                                                                                                    () => {
+                                                                                                        deleteCategory(
+                                                                                                            category.id
+                                                                                                        )
+                                                                                                    },
+                                                                                            }
+                                                                                        )
+                                                                                    }}
+                                                                                >
+                                                                                    <Icon>
+                                                                                        delete
+                                                                                    </Icon>
+                                                                                </Fab>
+                                                                            </StyledTableCell> */}
+                                                                        </StyledTableRow>
+                                                                    )
+                                                                )}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </TableContainer>
+                                                    {/* <Stack
+                                                        spacing={2}
+                                                        paddingTop={3}
+                                                        paddingBottom={1}
+                                                    >
+                                                        <Box
+                                                            my={2}
+                                                            display="flex"
+                                                            justifyContent="center"
+                                                        >
+                                                            <Pagination
+                                                                count={
+                                                                    totalPages
+                                                                }
+                                                                page={page + 1}
+                                                                onChange={
+                                                                    handleChangePage
+                                                                }
+                                                                variant="outlined"
+                                                                color="primary"
+                                                                showFirstButton
+                                                                showLastButton
+                                                            />
+                                                        </Box>
+                                                    </Stack> */}
+                                                </Box>
+                                            </SimpleCard>
+                                        </Grid>
+                                    </Grid>
+                                    <Button
+                                        color="success"
+                                        variant="contained"
+                                        size="large"
+                                        type="submit"
+                                        startIcon={'Xác nhận'}
+                                        style={{ width: '100%' }}
+                                    ></Button>
+                                </ValidatorForm>
                             </SimpleCard>
                         </TabPanel>
                         <TabPanel value={value} index={2}>
@@ -653,14 +821,7 @@ export default function VerticalTabs() {
                                                                                 order.code
                                                                             }
                                                                         />
-                                                                        {/* <ValidatorForm
-                                                                            onSubmit={
-                                                                                updateStatus
-                                                                            }
-                                                                            onError={() =>
-                                                                                null
-                                                                            }
-                                                                        > */}
+
                                                                         <ShowButton
                                                                             e={
                                                                                 order
@@ -669,7 +830,6 @@ export default function VerticalTabs() {
                                                                                 order.id
                                                                             }
                                                                         />
-                                                                        {/* </ValidatorForm> */}
                                                                     </StyledTableCell>
                                                                 </StyledTableRow>
                                                             )
@@ -680,6 +840,20 @@ export default function VerticalTabs() {
                                         </Box>
                                     </Grid>
                                 </Grid>
+                            </SimpleCard>
+                        </TabPanel>
+                        {/* Đánh giá của tôi */}
+                        <TabPanel value={value} index={4}>
+                            <SimpleCard title={'Đánh giá của tôi'}>
+                                <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 700 }}>
+                                        <TableBody>
+                                            <StyledTableRow>
+                                                <MyValuate></MyValuate>
+                                            </StyledTableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
                             </SimpleCard>
                         </TabPanel>
                     </Box>

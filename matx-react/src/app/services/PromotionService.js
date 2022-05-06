@@ -1,11 +1,15 @@
 import http from "./http-common";
 const URL_ADMIN = "/admin/promotions";
+const URL_GUEST = "/guest/promotion";
 class PromotionService{
     getPromotionsPagingAdmin(page,keyword){
         return http.get(URL_ADMIN+"?page="+page+"&keyword="+keyword);
     }
     getAllPromotionsAdmin(){
         return http.get(URL_ADMIN+"/all");
+    }
+    getAllPromotions(){
+        return http.get(URL_GUEST+"/all");
     }
     deletePromotionAdmin(id){
         return http.delete(URL_ADMIN+"/"+id);

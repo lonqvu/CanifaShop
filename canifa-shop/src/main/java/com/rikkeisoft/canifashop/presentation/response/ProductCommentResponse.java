@@ -20,4 +20,6 @@ public class ProductCommentResponse extends BaseResponse{
     private UserResponse userResponse;
     private ProductResponse productResponse;
     private String createdBy;
+    private List<String> listImages;
+//    private Boolean checkFavorite;
 }

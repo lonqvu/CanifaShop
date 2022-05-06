@@ -4,6 +4,7 @@ import com.rikkeisoft.canifashop.base.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,4 +22,10 @@ public class ProductCommentEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "productCommentEntity")
+    private Set<ProductCommentImagesEntity> commentImages;
+    public void addProductCommentImageEntity(ProductCommentImagesEntity productImageEntity) {
+        this.commentImages.add(productImageEntity);
+        productImageEntity.setProductCommentEntity(this);
+    }
 }

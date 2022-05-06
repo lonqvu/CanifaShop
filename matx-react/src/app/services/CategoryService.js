@@ -24,6 +24,10 @@ class CategoryService {
     getCategoryParent() {
         return http.get(URL_GUEST + "/parent");
     }
+       
+    getCategoryParentAdmin() {
+        return http.get(URL_ADMIN + "/parent");
+    }
 
     getProductsByCategory(seo, page) {
         return http.get(URL_GUEST + "/seo/" + seo + "?page=" + page);

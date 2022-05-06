@@ -11,10 +11,12 @@ import java.util.HashSet;
 
 import javax.transaction.Transactional;
 
-import com.rikkeisoft.canifashop.entity.UserEntity;
+import com.rikkeisoft.canifashop.entity.*;
+import com.rikkeisoft.canifashop.presentation.mapper.ProductCommentMapper;
 import com.rikkeisoft.canifashop.presentation.mapper.UserMapper;
+import com.rikkeisoft.canifashop.presentation.response.ProductCommentResponse;
 import com.rikkeisoft.canifashop.presentation.response.UserResponse;
-import com.rikkeisoft.canifashop.repository.UserRepository;
+import com.rikkeisoft.canifashop.repository.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.rikkeisoft.canifashop.common.exception.FileStorageException;
-import com.rikkeisoft.canifashop.entity.ProductEntity;
-import com.rikkeisoft.canifashop.entity.ProductImageEntity;
 import com.rikkeisoft.canifashop.presentation.mapper.ProductMapper;
 import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
-import com.rikkeisoft.canifashop.repository.ProductImageRepository;
-import com.rikkeisoft.canifashop.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +35,8 @@ public interface FileImageService {
 	ProductResponse storeFile(Long id, MultipartFile avatar, MultipartFile[] images);
 
 	UserResponse storeFileUser(Long id, MultipartFile avatar);
+
+	ProductCommentResponse storeFileComment(Long id, MultipartFile[] images);
 
 	Resource loadFileAsResource(String pathFile);
 
@@ -48,7 +48,11 @@ class FileImageServiceImpl implements FileImageService {
 
 	private final ProductRepository productRepository;
 
+	private final ProductCommentRepository productCommentRepository;
+
 	private final ProductImageRepository productImageRepository;
+
+	private final ProductCommentImageRepository productCommentImageRepository;
 
 	private final ProductService productService;
 
@@ -57,6 +61,8 @@ class FileImageServiceImpl implements FileImageService {
 	private final UserService userService;
 
 	private final UserRepository userRepository;
+
+	private final ProductCommentService productCommentService;
 
 	@Override
 	@Transactional
@@ -211,6 +217,60 @@ class FileImageServiceImpl implements FileImageService {
 		}
 
 	}
+
+	//Tao list anh cho Comment
+
+	private void createListImagesComment(ProductCommentEntity entity, String path, MultipartFile[] images) {
+
+		new File(root + "/" + entity.getId() + "/comment_images").mkdirs();
+		try {
+			entity.setCommentImages(new HashSet<>());
+			for (MultipartFile image : images) {
+				String pathImage = path + StringUtils.cleanPath(image.getOriginalFilename());
+
+				if (path.contains("..")) {
+					throw new FileStorageException("Sorry! Filename contains invalid path sequence " + pathImage);
+				}
+				Path targetLocation = this.root.resolve(pathImage);
+				Files.copy(image.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+				ProductCommentImagesEntity imageEntity = ProductCommentImagesEntity.builder().path(pathImage).build();
+				entity.addProductCommentImageEntity(imageEntity);
+
+			}
+		} catch (IOException e) {
+			throw new FileStorageException("Could not store file " + path + ". Please try again!");
+		}
+
+	}
+
+	@Override
+	@Transactional
+	public ProductCommentResponse storeFileComment(Long id, MultipartFile[] images) {
+
+		ProductCommentEntity entity = productCommentService.getEntityById(id);
+
+		if (entity != null) {
+			String newImage = id + "/comment_images/"; // Tạo path lưu cho Images
+
+			// Lưu Images
+			if (!isEmptyUploadFile(images)) {
+				if (entity.getCommentImages() != null && !entity.getCommentImages().isEmpty()) {
+					productImageRepository.deleteByProductId(id);
+					if (this.delete(id + "/comment_images")) {
+						createListImagesComment(entity, newImage, images);
+					}
+				} else {
+					createListImagesComment(entity, newImage, images);
+				}
+			}
+
+			productCommentRepository.save(entity);
+			return ProductCommentMapper.convertToResponse(entity);
+		} else {
+			return null;
+		}
+	}
+	////////////////////////////
 
 	private boolean isEmptyUploadFile(MultipartFile[] files) {
 		if (files == null || files.length <= 0)

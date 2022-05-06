@@ -6,6 +6,7 @@ import com.rikkeisoft.canifashop.entity.*;
 import com.rikkeisoft.canifashop.presentation.mapper.OrderMapper;
 import com.rikkeisoft.canifashop.presentation.request.OrderRequest;
 import com.rikkeisoft.canifashop.presentation.response.OrderResponse;
+import com.rikkeisoft.canifashop.presentation.response.RevenueByResponse;
 import com.rikkeisoft.canifashop.presentation.response.statisticalReponse;
 import com.rikkeisoft.canifashop.repository.*;
 
@@ -21,6 +22,7 @@ import javax.mail.MessagingException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,9 +46,30 @@ public interface OrderService {
 
 	List<statisticalReponse> getRevenueByYear(Integer year);
 
+	List<statisticalReponse> getRevenueByProduct(Integer year, String name);
+
 	BasePagerData<OrderResponse> getOrderByMonth(Integer page, Integer size, Integer year, Integer month);
 
   	OrderResponse getByCode(String code);
+
+  	List<RevenueByResponse> RevenueByTop5(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByTop5Cate(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByQuantity(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByCate(Long startDate, Long endDate, Long parentId);
+
+	List<RevenueByResponse> RevenueByTop10User(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByReturn(Long startDate, Long endDate);
+
+	Integer Return(String status, Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByQuantityOrderComplete(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByQuantityOrderCancel(Long startDate, Long endDate);
+
 
 }
 
@@ -178,6 +201,11 @@ class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	public List<statisticalReponse> getRevenueByProduct(Integer year, String name) {
+		return orderRepository.StatisticalByProductAndYear(year,name);
+	}
+
+	@Override
 	public BasePagerData<OrderResponse> getOrderByMonth(Integer page, Integer size, Integer year, Integer month) {
 		Pageable paging = PageRequest.of(page, size);
 
@@ -188,6 +216,105 @@ class OrderServiceImpl implements OrderService {
 	public OrderResponse getByCode(String code) {
 		OrderEntity orderEntity = orderRepository.findByCode(code);
 		return OrderMapper.convertToResponse(orderEntity);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByTop5(Long startDate, Long endDate){
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByTop5(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByTop5Cate(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByTop5Cate(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByQuantity(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByQuantity(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByCate(Long startDate, Long endDate, Long parentId) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByCate(startTime, endTime, parentId);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByTop10User(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByTop10User(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByReturn(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByReturn(startTime, endTime);
+	}
+
+	@Override
+	public Integer Return(String status, Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.Return(status ,startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByQuantityOrderComplete(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByQuantityOrderComplete(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByQuantityOrderCancel(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByQuantityOrderCancel(startTime, endTime);
 	}
 
 }

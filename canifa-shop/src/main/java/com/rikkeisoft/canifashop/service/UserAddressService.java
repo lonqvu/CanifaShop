@@ -92,7 +92,7 @@ class UserAddressServiceImpl implements UserAddressService {
 	}
 
 	@Transactional
-	private void checkAddressIsDefault(UserAddressRequest request) {
+	public void checkAddressIsDefault(UserAddressRequest request) {
 		if (request.isDefault()) {
 			userAddressRepository.setNotDefaultForAddress(request.getUserId());
 		}

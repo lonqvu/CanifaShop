@@ -54,4 +54,9 @@ public class CategoryAdminController extends BaseController {
 		return success("Delete category successful");
 	}
 
+	@GetMapping("/parent")
+	public ResponseEntity<BaseResponseEntity> getCategoryParent() {
+		return success(categoryService.getCategoryParent(), "Get categories parent successful");
+	}
+
 }

@@ -87,7 +87,6 @@ export default function OrderDetail(props) {
             >
                 <DialogTitle>Chi tiết đơn hàng</DialogTitle>
                 <Box width="auto" margin="20px" overflow="auto">
-                    {/* {Mot table} */}
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 700 }}>
                             <TableHead>
@@ -114,6 +113,7 @@ export default function OrderDetail(props) {
                                     <StyledTableRow key={order.id}>
                                         <StyledTableCell align="center">
                                             <IMG src={URL_IMG + order.avatar} />
+                                           
                                         </StyledTableCell>
                                         <StyledTableCell align="center">
                                             {order.name}

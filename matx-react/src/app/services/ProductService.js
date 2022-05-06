@@ -52,11 +52,31 @@ class ProductService {
         }
         return http.post(URL_ADMIN + '/' + 'uploadfile' + '/' + productId, formData)
     }
+
+    createOrUpdateImageComment(commentId, images) {
+        let formData = new FormData();
+        if (images.length <= 0) {
+            formData.append("images", images);
+        } else {
+            for (let i = 0; i < images.length; i++) {
+                formData.append("images", images[i]);
+            }
+        }
+        return http.post(URL_GUEST + '/uploadfile' + '/' + commentId, formData)
+    }
+
     createComment(productId, product){
         return http.post(URL_GUEST + "/" + productId+"/comment", product);
     }
+    getCommentByUser(id, page){
+        return http.get(URL_GUEST+"/comment/user/"+id+"/?page="+page);
+    }
     createFavotite(productId, product){
         return http.post(URL_GUEST+"/" + productId, product);
+    }
+
+    getCheckFavorite(productId){
+        return http.get(URL_GUEST+"/getCheck/"+productId)
     }
 
 }

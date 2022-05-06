@@ -146,7 +146,7 @@ const AppUser = () => {
 
     useEffect(() => {
         getData()
-        PromotionService.getAllPromotionsAdmin().then((response) => {
+        PromotionService.getAllPromotions().then((response) => {
             setPromition(response.data.data)
         })
     }, [])
@@ -760,13 +760,37 @@ const AppUser = () => {
                                                             onChange={(
                                                                 event,
                                                                 promotion
-                                                            ) =>
-                                                                setDiscount(
-                                                                    totalCost *
+                                                            ) => {
+                                                                if (
+                                                                    totalCost <
+                                                                    promotion.discountFrom
+                                                                ) {
+                                                                    setNotify({
+                                                                        isOpen: true,
+                                                                        message:
+                                                                            'Đơn hàng chưa đạt giá trị tối thiểu',
+                                                                        type: 'error',
+                                                                    })
+                                                                    setDiscount(
+                                                                        0
+                                                                    )
+                                                                } else {
+                                                                    if (
+                                                                        totalCost *
                                                                         (promotion.discountPercent /
-                                                                            100)
-                                                                )
-                                                            }
+                                                                            100) > promotion.discountMax
+                                                                    ){
+                                                                        setDiscount(promotion.discountMax)
+                                                                    }
+                                                                    else{
+                                                                        setDiscount(
+                                                                            totalCost *
+                                                                                (promotion.discountPercent /
+                                                                                    100)
+                                                                        )
+                                                                    }
+                                                                }
+                                                            }}
                                                             sx={{
                                                                 width: '100%',
                                                                 '& .MuiFormControl-root':

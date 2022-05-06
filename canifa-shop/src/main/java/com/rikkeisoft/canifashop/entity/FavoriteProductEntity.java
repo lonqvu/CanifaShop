@@ -17,6 +17,8 @@ public class FavoriteProductEntity extends BaseEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", unique = true)
     private ProductEntity productEntity;
+
+
 }
