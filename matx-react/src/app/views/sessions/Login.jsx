@@ -2,14 +2,9 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, styled, useTheme } from '@mui/system'
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator'
-import {
-    Card,
-    Grid,
-    Button,
-    CircularProgress
-} from '@mui/material'
+import { Card, Grid, Button, CircularProgress } from '@mui/material'
 import { Span } from 'app/components/Typography'
-import { AuthService, localStorageService } from 'app/services';
+import { AuthService, localStorageService } from 'app/services'
 import { Notify, AlertDialog, showError } from 'app/views/action'
 
 const FlexBox = styled(Box)(() => ({
@@ -52,7 +47,11 @@ const JwtLogin = () => {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [state, setState] = useState({})
-    const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
+    const [notify, setNotify] = useState({
+        isOpen: false,
+        message: '',
+        type: '',
+    })
     const handleChange = ({ target: { name, value } }) => {
         setState({
             ...state,
@@ -62,29 +61,60 @@ const JwtLogin = () => {
 
     const signinAccount = async (e) => {
         setLoading(true)
-        AuthService.login(state).then((response) => {
-            localStorageService.setItem('accessToken', response.data.data)
-            window.setTimeout(function () {
-                window.location.href = '/';
-            }, 1000);
-            setNotify({
-                isOpen: true,
-                message: 'Đăng nhập thành công!, vui lòng chờ!',
-                type: 'success'
+
+        AuthService.login(state)
+            .then((response) => {
+                localStorageService.setItem('accessToken', response.data.data)
+                let jwt = response.data.data
+                let jwtData = jwt.split('.')[1]
+                let decodedJwtJsonData = window.atob(jwtData)
+                let decodedJwtData = JSON.parse(decodedJwtJsonData)
+                let isAdmin = decodedJwtData.roles[0]
+                if(isAdmin == 'ROLE_ADMIN'){
+                    window.setTimeout(function () {
+                        window.location.href = '/admin'
+                    }, 1000)
+                    setNotify({
+                        isOpen: true,
+                        message: 'Đăng nhập với tư cách người quản trị!',
+                        type: 'success',
+                    })
+                }
+
+                else if(isAdmin == 'ROLE_STAFF'){
+                    window.setTimeout(function () {
+                        window.location.href = '/staff'
+                    }, 1000)
+                    setNotify({
+                        isOpen: true,
+                        message: 'Đăng nhập với tư cách nhân viên!',
+                        type: 'success',
+                    })
+                }
+               
+                else{
+                    window.setTimeout(function () {
+                        window.location.href = '/'
+                    }, 1000)
+                    setNotify({
+                        isOpen: true,
+                        message: 'Đăng nhập thành công!',
+                        type: 'success',
+                    })
+                }
             })
-        }).catch(error => {
-            setLoading(false)
-            setNotify({
-                isOpen: true,
-                message: 'Đăng nhập thất bại',
-                type: 'error'
+            .catch((error) => {
+                setLoading(false)
+                setNotify({
+                    isOpen: true,
+                    message: 'Sai người dùng hoặc mật khẩu',
+                    type: 'error',
+                })
             })
-        })
         setNotify({
             ...notify,
-            isOpen: false
+            isOpen: false,
         })
-
     }
 
     const { palette } = useTheme()
@@ -117,7 +147,7 @@ const JwtLogin = () => {
                                     name="username"
                                     value={username}
                                     validators={['required']}
-                                    errorMessages={['this field is required']}
+                                    errorMessages={['Vui lòng nhập tên tài khoản']}
                                 />
                                 <TextValidator
                                     sx={{ mb: '12px', width: '100%' }}
@@ -129,7 +159,7 @@ const JwtLogin = () => {
                                     type="password"
                                     value={password}
                                     validators={['required']}
-                                    errorMessages={['this field is required']}
+                                    errorMessages={['Vui lòng nhập mật khẩu']}
                                 />
 
                                 <FlexBox mb={2} flexWrap="wrap">
@@ -152,18 +182,14 @@ const JwtLogin = () => {
                                     <Span sx={{ mr: 1, ml: '20px' }}>Hoặc</Span>
                                     <Button
                                         sx={{ textTransform: 'capitalize' }}
-                                        onClick={() =>
-                                            navigate('/register')
-                                        }
+                                        onClick={() => navigate('/register')}
                                     >
                                         Đăng ký
                                     </Button>
                                 </FlexBox>
                                 <Button
                                     sx={{ color: textPrimary }}
-                                    onClick={() =>
-                                        navigate('/forgot-password')
-                                    }
+                                    onClick={() => navigate('/forgot-password')}
                                 >
                                     Quên mật khẩu?
                                 </Button>
@@ -172,12 +198,7 @@ const JwtLogin = () => {
                     </Grid>
                 </Grid>
                 <>
-                    <Notify
-                        notify={notify}
-                        setNotify={setNotify}
-                    >
-
-                    </Notify>
+                    <Notify notify={notify} setNotify={setNotify}></Notify>
                 </>
             </Card>
         </JWTRoot>

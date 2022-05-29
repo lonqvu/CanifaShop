@@ -22,6 +22,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "tbl_categories")
 public class CategoryEntity extends BaseEntity {
+	@Column
+	private String avatar;
 
 	@Column(name = "name", length = 45, nullable = false)
 	private String name;

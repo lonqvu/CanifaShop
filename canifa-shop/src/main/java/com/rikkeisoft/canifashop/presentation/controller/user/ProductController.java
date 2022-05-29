@@ -3,22 +3,28 @@ package com.rikkeisoft.canifashop.presentation.controller.user;
 import com.rikkeisoft.canifashop.base.BaseController;
 import com.rikkeisoft.canifashop.base.BasePagerData;
 import com.rikkeisoft.canifashop.base.BaseResponseEntity;
+import com.rikkeisoft.canifashop.presentation.request.FavoriteProductRequest;
+import com.rikkeisoft.canifashop.presentation.request.ProductCommentRequest;
+import com.rikkeisoft.canifashop.presentation.response.ProductCommentResponse;
 import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
-import com.rikkeisoft.canifashop.service.FileImageService;
-import com.rikkeisoft.canifashop.service.ProductService;
+import com.rikkeisoft.canifashop.repository.OrderRepository;
+import com.rikkeisoft.canifashop.service.*;
 
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "${domain.origins}")
 @RestController
@@ -28,6 +34,9 @@ public class ProductController extends BaseController {
 
 	private final ProductService productService;
 	private final FileImageService fileImageService;
+	private final ProductCommentService productCommentService;
+	private final FavoriteProductService favoriteProductService;
+	private final OrderRepository orderRepository;
 
 	@GetMapping("/products/search")
 	public ResponseEntity<BasePagerData<ProductResponse>> getProductsByKeyword(
@@ -40,11 +49,16 @@ public class ProductController extends BaseController {
 		return ResponseEntity
 				.ok(productService.getProductsByKeyword(page, PAGE_SIZE, search, priceMin, priceMax, categoryId));
 	}
-
 	@GetMapping("/products/hot")
 	public ResponseEntity<BaseResponseEntity> getProductsByHot() {
 		return success(productService.getByHot(), "Get list products hot successful");
 	}
+
+	@GetMapping("/products/cate/{id}")
+	public ResponseEntity<BaseResponseEntity> getProductsByHot(@PathVariable("id") Long id) {
+		return success(productService.getByCate(id), "Get list products by cate successful");
+	}
+
 
 	@GetMapping("/products/detail/{seo}")
 	public ResponseEntity<BaseResponseEntity> getProductBySeo(@PathVariable("seo") String seo) {
@@ -73,5 +87,70 @@ public class ProductController extends BaseController {
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
 				.body(resource);
 	}
+
+//	Comment product
+
+	@PostMapping("/products/{id}/comment")
+	ResponseEntity<BaseResponseEntity> addProductComment(@RequestBody ProductCommentRequest productCommentRequest,
+														 @PathVariable("id") Long id){
+		return success(productCommentService.createComment(productCommentRequest, id), "Add comment successful");
+	}
+	@GetMapping("/products/comment/{id}")
+	ResponseEntity<BasePagerData<ProductCommentResponse>> getProductCommentById(@PathVariable("id") Long id
+			, @RequestParam(name = "page", defaultValue = "0") Integer page){
+		return ResponseEntity.ok(productCommentService.getListComment(page, PAGE_SIZE, id));
+	}
+	@GetMapping("/products/comment/user/{id}")
+	ResponseEntity<BasePagerData<ProductCommentResponse>> getProductCommentByUserId(@PathVariable("id") Long id
+			, @RequestParam(name = "page", defaultValue = "0") Integer page){
+		return ResponseEntity.ok(productCommentService.getListCommentByUser(page, PAGE_SIZE, id));
+	}
+
+	@PostMapping("/products/uploadfile/{id}")
+	public ResponseEntity<BaseResponseEntity> uploadFile(@PathVariable("id") Long id,
+														 @RequestParam("images") MultipartFile[] images) {
+
+		return created(fileImageService.storeFileComment(id, images), "Create images of comment product successful");
+	}
+	@PutMapping("/products/editComment/{id}")
+	ResponseEntity<BaseResponseEntity> updateCommentProduct(@RequestBody ProductCommentRequest productCommentRequest,
+															@PathVariable("id") Long id) {
+		return success(productCommentService.editComment(productCommentRequest, id), "edit comment products successful");
+	}
+	// add list favorite
+	@PostMapping("/products/{id}")
+	ResponseEntity<BaseResponseEntity> addFavoriteProduct(@RequestBody FavoriteProductRequest favoriteProductRequest,
+													 @PathVariable("id") Long id){
+		return success(favoriteProductService.addListFavoriteProduct(favoriteProductRequest, id), "Add favorite products successful");
+	}
+
+	// get list favorite
+	@GetMapping("/products/getall")
+	ResponseEntity<BaseResponseEntity> getAllFavorite(){
+
+		return success(favoriteProductService.getListFavoriteProduct(), "get list favorite product successful");
+	}
+	@GetMapping("/products/getProductByUserId/{id}")
+	ResponseEntity<BaseResponseEntity> getAllFavoriteByUserId(@PathVariable("id") Long id){
+
+		return success(favoriteProductService.getFavoriteByUserId(id), "get favorite product by user successful");
+	}
+
+	@GetMapping("/products/getCheck/{id}")
+	ResponseEntity<BaseResponseEntity> getCheck(@PathVariable("id") Long id){
+
+		return success(favoriteProductService.checkFavorite(id), "get list favorite product successful");
+	}
+
+	@GetMapping("/countProduct/{id}")
+	public ResponseEntity<?> getCountOrders(@PathVariable("id") Long id){
+		return ResponseEntity.ok(orderRepository.countProduct(id));
+	}
+
+	@GetMapping("/products/parentBoy")
+	public ResponseEntity<BaseResponseEntity> getCategoryParentBoy() {
+		return success(productService.getProductParentBoy(), "Get categories parent boy successful");
+	}
+
 
 }

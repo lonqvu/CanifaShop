@@ -16,7 +16,8 @@ public class UserMapper {
 	public static UserResponse convertToResponse(UserEntity entity) {
 		UserResponse response = UserResponse.builder().id(entity.getId()).username(entity.getUsername())
 				.firstName(entity.getFirstName()).lastName(entity.getLastName()).phone(entity.getPhone())
-				.email(entity.getEmail()).locked(entity.getLocked()).build();
+				.createdAt(entity.getCreatedAt())
+				.email(entity.getEmail()).locked(entity.getLocked()).avatar(entity.getAvatar()).build();
 
 		if (entity.getGender() != null) {
 			switch (entity.getGender()) {

@@ -18,5 +18,6 @@ public class CategoryResponse extends BaseResponse{
 	private String name;
 	private String seo;
 	private CategoryResponse parent;
+	private String avatar;
 
 }

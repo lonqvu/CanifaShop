@@ -14,6 +14,7 @@ public class PromotionMapper {
 		return PromotionResponse.builder().id(entity.getId()).name(entity.getName())
 				.startDate(entity.getStartDate()).endDate(entity.getEndDate())
 				.discountPercent(entity.getDiscountPercent()).discountMax(entity.getDiscountMax())
+				.avatar(entity.getAvatar())
 				.discountFrom(entity.getDiscountFrom()).build();
 	}
 
@@ -22,6 +23,7 @@ public class PromotionMapper {
 		return PromotionEntity.builder().name(request.getName())
 				.startDate(request.getStartDate()).endDate(request.getEndDate())
 				.discountFrom(request.getDiscountFrom())
+				.avatar(request.getAvatar())
 				.discountMax(request.getDiscountMax()).discountPercent(request.getDiscountPercent()).build();
 	}
 

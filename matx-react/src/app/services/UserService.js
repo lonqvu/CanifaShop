@@ -27,7 +27,6 @@ class UserService {
     getUserAdminById(id) {
         return http.get(URL_ADMIN + "/" + id);
     }
-
     updateUser(username, user) {
         return http.put(URL_USER + "/edit" + "/" + username, user);
     }
@@ -47,6 +46,25 @@ class UserService {
     getOrderDetailsByCode(code) {
         return http.get(URL_CART + "/detail" + "/" + code);
     }
+    updateStatus(orderId, orders){
+        return http.put(URL_USER +"/updateStatus/" + orderId+"?orderStatus="+ orders);
+    }
+
+    getNameRole(){
+        return http.get(URL_ADMIN + "/getNameRole")
+    }
+    getRoleByUserId(id){
+        return http.get(URL_ADMIN+"/getRoleById/"+id)
+    }
+    updateRole(id, name){
+        return http.put(URL_ADMIN +"/updateRoles/"+id+"/?name="+name)
+    }
+    uploadAvatar(id, avatar){
+        let formData = new FormData();
+        formData.append("avatar", avatar);
+        return http.post(URL_USER + '/uploadfile' + '/' +id, formData)
+    }
+    
 
 }
 export default new UserService();

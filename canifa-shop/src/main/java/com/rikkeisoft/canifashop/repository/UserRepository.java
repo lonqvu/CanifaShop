@@ -2,6 +2,7 @@ package com.rikkeisoft.canifashop.repository;
 
 import java.util.List;
 
+import com.rikkeisoft.canifashop.entity.RoleEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +16,7 @@ import com.rikkeisoft.canifashop.entity.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
 	@Query(value = "SELECT * FROM tbl_users WHERE deleted_flag IS FALSE "
-			+ "AND (:keyword IS NULL or (username LIKE %:keyword% OR first_name LIKE %:keyword% OR last_name LIKE %:keyword%)) "
-			+ "AND id NOT IN (SELECT user_id FROM tbl_users_roles WHERE role_id = 1) ", nativeQuery = true)
+			+ "AND (:keyword IS NULL or (username LIKE %:keyword% OR first_name LIKE %:keyword% OR last_name LIKE %:keyword%)) ", nativeQuery = true)
 	Page<UserEntity> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
 	Boolean existsByUsername(String username);
@@ -28,8 +28,14 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
 	UserEntity findByUsername(String username);
 
-	@Query(value = "SELECT id FROM tbl_users WHERE username =:username ", nativeQuery = true)
-	List<Long> getIdByUsername(@Param("username") String username);
+	@Query(value = "SELECT * FROM tbl_users WHERE username =:username ", nativeQuery = true)
+	Long getIdByUsername(@Param("username") String username);
+
 	@Query(value = "SELECT COUNT(id) FROM tbl_users WHERE deleted_flag IS FALSE", nativeQuery = true)
 	int countUsers();
+
+
+
+
+
 }

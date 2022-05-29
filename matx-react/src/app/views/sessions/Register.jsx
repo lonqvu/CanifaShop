@@ -78,6 +78,11 @@ const JwtRegister = () => {
             
         }).catch(error => {
             setLoading(false)
+            setNotify({
+                isOpen: true,
+                message: 'Tài khoản hoặc email đã tồn tại!',
+                type: 'error'
+            })
         })
         setNotify({
             ...notify,
@@ -112,7 +117,7 @@ const JwtRegister = () => {
                                     name="username"
                                     value={username || ''}
                                     validators={['required']}
-                                    errorMessages={['this field is required']}
+                                    errorMessages={['Vui lòng nhập tên tài khoản']}
                                 />
                                 <TextValidator
                                     sx={{ mb: 3, width: '100%' }}
@@ -125,8 +130,8 @@ const JwtRegister = () => {
                                     value={email || ''}
                                     validators={['required', 'isEmail']}
                                     errorMessages={[
-                                        'this field is required',
-                                        'email is not valid',
+                                        'Vui lòng nhập email',
+                                        'Email không hợp lệ',
                                     ]}
                                 />
                                 <TextValidator
@@ -139,7 +144,7 @@ const JwtRegister = () => {
                                     type="password"
                                     value={password || ''}
                                     validators={['required']}
-                                    errorMessages={['this field is required']}
+                                    errorMessages={['Vui lòng nhập mật khẩu']}
                                 />
                                 <TextValidator
                                     sx={{ mb: '16px', width: '100%' }}
@@ -152,8 +157,8 @@ const JwtRegister = () => {
                                     value={confirmPassword || ''}
                                     validators={['required', 'isPasswordMatch']}
                                     errorMessages={[
-                                        'this field is required',
-                                        "password didn't match",
+                                        'Vui lòng nhập lại mật khẩu',
+                                        "Mật khẩu nhập lại không đúng",
                                     ]}
                                 />
                                 <FlexBox>

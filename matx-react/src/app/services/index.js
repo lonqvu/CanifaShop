@@ -7,5 +7,8 @@ export { default as UserService } from './UserService'
 export { default as OrderService } from './OrderService'
 export { default as HomeService } from './StatisTicalService'
 export { default as AuthService } from './AuthService'
+export { default as UserAddressService } from './UserAddressService'
+export { default as  StatisTicalService } from './StatisTicalService'
+
 export { URL_IMG } from './http-common'
 export { default as localStorageService } from './localStorageService'

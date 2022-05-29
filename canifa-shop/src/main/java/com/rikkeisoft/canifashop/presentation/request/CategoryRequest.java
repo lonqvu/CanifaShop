@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class CategoryRequest {
-	
+	private String avatar;
 	private String name;
 	private Long parentId;
 }

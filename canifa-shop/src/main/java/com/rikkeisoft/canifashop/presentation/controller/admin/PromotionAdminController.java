@@ -1,5 +1,6 @@
 package com.rikkeisoft.canifashop.presentation.controller.admin;
 
+import com.rikkeisoft.canifashop.service.FileImageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +21,7 @@ import com.rikkeisoft.canifashop.presentation.response.PromotionResponse;
 import com.rikkeisoft.canifashop.service.PromotionService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "${domain.origins}")
 @RestController
@@ -28,6 +30,8 @@ import lombok.RequiredArgsConstructor;
 public class PromotionAdminController extends BaseController {
 
 	private final PromotionService promotionService;
+
+	private final FileImageService fileImageService;
 
 	@GetMapping
 	public ResponseEntity<BasePagerData<PromotionResponse>> getPromotionsByPaging(
@@ -61,6 +65,13 @@ public class PromotionAdminController extends BaseController {
 	public ResponseEntity<BaseResponseEntity> deletePromotion(@PathVariable("id") Long id) {
 		promotionService.deleteById(id);
 		return success("Delete promotion successful");
+	}
+
+	@PostMapping("/uploadfile/{id}")
+	public ResponseEntity<BaseResponseEntity> uploadFile(@PathVariable("id") Long id,
+														 @RequestParam("avatar") MultipartFile avatar) {
+
+		return created(fileImageService.storeFilePromiton(id, avatar), "Create images of category successful");
 	}
 
 }

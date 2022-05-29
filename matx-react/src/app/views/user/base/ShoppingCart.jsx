@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import useSettings from 'app/hooks/useSettings'
 import { themeShadows } from 'app/components/MatxTheme/themeColors'
 import { topBarHeight } from 'app/utils/constant'
+import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import {
     Icon,
     Badge,
@@ -141,7 +142,7 @@ function ShoppingCart({ container }) {
         <Fragment>
             <IconButton onClick={handleDrawerToggle}>
                 <Badge color="secondary" badgeContent={totalOrder}>
-                    <Icon sx={{ color: textColor }}>shopping_cart</Icon>
+                    < ShoppingBagOutlinedIcon  sx={{ color: textColor, marginLeft:'10px' }}/>
                 </Badge>
             </IconButton>
 
@@ -158,7 +159,7 @@ function ShoppingCart({ container }) {
                 >
                     <MiniCart>
                         <CartBox>
-                            <Icon color="primary" sx={{ marginRight: '10px' }}>shopping_cart</Icon>
+                            < ShoppingBagOutlinedIcon  color="primary" sx={{ marginLeft: '10px' }}/>
                             <h3>Giỏ hàng</h3>
                         </CartBox>
 

@@ -2,255 +2,319 @@
   "city": [
     {
       "idCity": "01",
-      "name": "Thành phố Hà Nội"
+      "name": "Thành phố Hà Nội",
+      "ship": 15000
     },
     {
       "idCity": "79",
-      "name": "Thành phố Hồ Chí Minh"
+      "name": "Thành phố Hồ Chí Minh",
+      "ship": 35000
     },
     {
       "idCity": "31",
       "name": "Thành phố Hải Phòng"
+      ,"ship": 23000
     },
     {
       "idCity": "48",
-      "name": "Thành phố Đà Nẵng"
+      "name": "Thành phố Đà Nẵng",
+      "ship": 30000
     },
     {
       "idCity": "92",
-      "name": "Thành phố Cần Thơ"
+      "name": "Thành phố Cần Thơ",
+      "ship": 31000
     },
     {
       "idCity": "02",
-      "name": "Tỉnh Hà Giang"
+      "name": "Tỉnh Hà Giang",
+      "ship": 22000
+      
     },
     {
       "idCity": "04",
-      "name": "Tỉnh Cao Bằng"
+      "name": "Tỉnh Cao Bằng",
+      "ship": 18000
     },
     {
       "idCity": "06",
-      "name": "Tỉnh Bắc Kạn"
+      "name": "Tỉnh Bắc Kạn",
+      "ship": 22000
     },
     {
       "idCity": "08",
-      "name": "Tỉnh Tuyên Quang"
+      "name": "Tỉnh Tuyên Quang",
+      "ship": 22000
     },
     {
       "idCity": "10",
-      "name": "Tỉnh Lào Cai"
+      "name": "Tỉnh Lào Cai",
+      "ship": 18000
     },
     {
       "idCity": "11",
-      "name": "Tỉnh Điện Biên"
+      "name": "Tỉnh Điện Biên",
+      "ship": 18000
     },
     {
       "idCity": "12",
-      "name": "Tỉnh Lai Châu"
+      "name": "Tỉnh Lai Châu",
+      "ship": 10000
     },
     {
       "idCity": "14",
-      "name": "Tỉnh Sơn La"
+      "name": "Tỉnh Sơn La",
+      "ship": 22000
     },
     {
       "idCity": "15",
-      "name": "Tỉnh Yên Bái"
+      "name": "Tỉnh Yên Bái",
+      "ship": 18000
     },
     {
       "idCity": "17",
-      "name": "Tỉnh Hoà Bình"
+      "name": "Tỉnh Hoà Bình",
+      "ship": 19000
     },
     {
       "idCity": "19",
-      "name": "Tỉnh Thái Nguyên"
+      "name": "Tỉnh Thái Nguyên",
+      "ship": 23000
     },
     {
       "idCity": "20",
-      "name": "Tỉnh Lạng Sơn"
+      "name": "Tỉnh Lạng Sơn",
+      "ship": 18000
     },
     {
       "idCity": "22",
-      "name": "Tỉnh Quảng Ninh"
+      "name": "Tỉnh Quảng Ninh",
+      "ship": 18000
     },
     {
       "idCity": "24",
-      "name": "Tỉnh Bắc Giang"
+      "name": "Tỉnh Bắc Giang",
+      "ship": 23000
     },
     {
       "idCity": "25",
-      "name": "Tỉnh Phú Thọ"
+      "name": "Tỉnh Phú Thọ",
+      "ship": 18000
     },
     {
       "idCity": "26",
-      "name": "Tỉnh Vĩnh Phúc"
+      "name": "Tỉnh Vĩnh Phúc",
+      "ship": 18000
     },
     {
       "idCity": "27",
-      "name": "Tỉnh Bắc Ninh"
+      "name": "Tỉnh Bắc Ninh",
+      "ship": 23000
     },
     {
       "idCity": "30",
-      "name": "Tỉnh Hải Dương"
+      "name": "Tỉnh Hải Dương",
+      "ship": 18000
     },
     {
       "idCity": "33",
-      "name": "Tỉnh Hưng Yên"
+      "name": "Tỉnh Hưng Yên",
+      "ship": 18000
     },
     {
       "idCity": "34",
-      "name": "Tỉnh Thái Bình"
+      "name": "Tỉnh Thái Bình",
+      "ship": 23000
     },
     {
       "idCity": "35",
-      "name": "Tỉnh Hà Nam"
+      "name": "Tỉnh Hà Nam",
+      "ship": 18000
     },
     {
       "idCity": "36",
-      "name": "Tỉnh Nam Định"
+      "name": "Tỉnh Nam Định",
+      "ship": 27000
     },
     {
       "idCity": "37",
-      "name": "Tỉnh Ninh Bình"
+      "name": "Tỉnh Ninh Bình",
+      "ship": 23000
     },
     {
       "idCity": "38",
-      "name": "Tỉnh Thanh Hóa"
+      "name": "Tỉnh Thanh Hóa",
+      "ship": 27000
     },
     {
       "idCity": "40",
-      "name": "Tỉnh Nghệ An"
+      "name": "Tỉnh Nghệ An",
+      "ship": 23000
     },
     {
       "idCity": "42",
-      "name": "Tỉnh Hà Tĩnh"
+      "name": "Tỉnh Hà Tĩnh",
+      "ship": 27000
     },
     {
       "idCity": "44",
-      "name": "Tỉnh Quảng Bình"
+      "name": "Tỉnh Quảng Bình",
+      "ship": 23000
     },
     {
       "idCity": "45",
-      "name": "Tỉnh Quảng Trị"
+      "name": "Tỉnh Quảng Trị",
+      "ship": 27000
     },
     {
       "idCity": "46",
-      "name": "Tỉnh Thừa Thiên Huế"
+      "name": "Tỉnh Thừa Thiên Huế",
+      "ship": 23000
     },
     {
       "idCity": "49",
-      "name": "Tỉnh Quảng Nam"
+      "name": "Tỉnh Quảng Nam",
+      "ship": 30000
     },
     {
       "idCity": "51",
-      "name": "Tỉnh Quảng Ngãi"
+      "name": "Tỉnh Quảng Ngãi",
+      "ship": 23000
     },
     {
       "idCity": "52",
-      "name": "Tỉnh Bình Định"
+      "name": "Tỉnh Bình Định",
+      "ship": 30000
     },
     {
       "idCity": "54",
-      "name": "Tỉnh Phú Yên"
+      "name": "Tỉnh Phú Yên",
+      "ship": 23000
     },
     {
       "idCity": "56",
-      "name": "Tỉnh Khánh Hòa"
+      "name": "Tỉnh Khánh Hòa",
+      "ship": 30000
     },
     {
       "idCity": "58",
-      "name": "Tỉnh Ninh Thuận"
+      "name": "Tỉnh Ninh Thuận",
+      "ship": 23000
     },
     {
       "idCity": "60",
-      "name": "Tỉnh Bình Thuận"
+      "name": "Tỉnh Bình Thuận",
+      "ship": 30000
     },
     {
       "idCity": "62",
-      "name": "Tỉnh Kon Tum"
+      "name": "Tỉnh Kon Tum",
+      "ship": 23000
     },
     {
       "idCity": "64",
-      "name": "Tỉnh Gia Lai"
+      "name": "Tỉnh Gia Lai",
+      "ship": 30000
     },
     {
       "idCity": "66",
-      "name": "Tỉnh Đắk Lắk"
+      "name": "Tỉnh Đắk Lắk",
+      "ship": 23000
     },
     {
       "idCity": "67",
-      "name": "Tỉnh Đắk Nông"
+      "name": "Tỉnh Đắk Nông",
+      "ship": 23000
     },
     {
       "idCity": "68",
-      "name": "Tỉnh Lâm Đồng"
+      "name": "Tỉnh Lâm Đồng",
+      "ship": 30000
     },
     {
       "idCity": "70",
-      "name": "Tỉnh Bình Phước"
+      "name": "Tỉnh Bình Phước",
+      "ship": 33000
     },
     {
       "idCity": "72",
-      "name": "Tỉnh Tây Ninh"
+      "name": "Tỉnh Tây Ninh",
+      "ship": 34000
     },
     {
       "idCity": "74",
-      "name": "Tỉnh Bình Dương"
+      "name": "Tỉnh Bình Dương",
+      "ship": 23000
     },
     {
       "idCity": "75",
-      "name": "Tỉnh Đồng Nai"
+      "name": "Tỉnh Đồng Nai",
+      "ship": 33000
     },
     {
       "idCity": "77",
-      "name": "Tỉnh Bà Rịa - Vũng Tàu"
+      "name": "Tỉnh Bà Rịa - Vũng Tàu",
+      "ship": 33000
     },
     {
       "idCity": "80",
-      "name": "Tỉnh Long An"
+      "name": "Tỉnh Long An",
+      "ship": 28000
     },
     {
       "idCity": "82",
-      "name": "Tỉnh Tiền Giang"
+      "name": "Tỉnh Tiền Giang",
+      "ship": 28000
     },
     {
       "idCity": "83",
-      "name": "Tỉnh Bến Tre"
+      "name": "Tỉnh Bến Tre",
+      "ship": 25000
     },
     {
       "idCity": "84",
-      "name": "Tỉnh Trà Vinh"
+      "name": "Tỉnh Trà Vinh",
+      "ship": 15000
     },
     {
       "idCity": "86",
-      "name": "Tỉnh Vĩnh Long"
+      "name": "Tỉnh Vĩnh Long",
+      "ship": 23000
     },
     {
       "idCity": "87",
-      "name": "Tỉnh Đồng Tháp"
+      "name": "Tỉnh Đồng Tháp",
+      "ship": 35000
     },
     {
       "idCity": "89",
-      "name": "Tỉnh An Giang"
+      "name": "Tỉnh An Giang",
+      "ship": 25000
     },
     {
       "idCity": "91",
-      "name": "Tỉnh Kiên Giang"
+      "name": "Tỉnh Kiên Giang",
+      "ship": 28000
     },
     {
       "idCity": "93",
-      "name": "Tỉnh Hậu Giang"
+      "name": "Tỉnh Hậu Giang",
+      "ship": 25000
     },
     {
       "idCity": "94",
-      "name": "Tỉnh Sóc Trăng"
+      "name": "Tỉnh Sóc Trăng",
+      "ship": 28000
     },
     {
       "idCity": "95",
-      "name": "Tỉnh Bạc Liêu"
+      "name": "Tỉnh Bạc Liêu",
+      "ship": 28000
     },
     {
       "idCity": "96",
-      "name": "Tỉnh Cà Mau"
+      "name": "Tỉnh Cà Mau",
+      "ship": 38000
     }
   ],
   "district": [

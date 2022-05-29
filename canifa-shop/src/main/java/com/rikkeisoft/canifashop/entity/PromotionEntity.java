@@ -21,7 +21,8 @@ import java.sql.Date;
 @Entity
 @Table(name = "tbl_promotions")
 public class PromotionEntity extends BaseEntity {
-
+	@Column
+	private String avatar;
 	@Column(name = "name", length = 255, nullable = false)
 	private String name;
 

@@ -17,6 +17,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ProductOrderResponse extends BaseResponse{
 
+	private String avatar;
+
 	private String name;
 
 	private String size;
@@ -27,6 +29,6 @@ public class ProductOrderResponse extends BaseResponse{
 
 	private BigDecimal price;
 
-	private BigDecimal priceSale;
+	private Integer discount;
 
 }

@@ -11,6 +11,10 @@ import java.util.HashSet;
 
 import javax.transaction.Transactional;
 
+import com.rikkeisoft.canifashop.entity.*;
+import com.rikkeisoft.canifashop.presentation.mapper.*;
+import com.rikkeisoft.canifashop.presentation.response.*;
+import com.rikkeisoft.canifashop.repository.*;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -19,12 +23,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.rikkeisoft.canifashop.common.exception.FileStorageException;
-import com.rikkeisoft.canifashop.entity.ProductEntity;
-import com.rikkeisoft.canifashop.entity.ProductImageEntity;
-import com.rikkeisoft.canifashop.presentation.mapper.ProductMapper;
-import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
-import com.rikkeisoft.canifashop.repository.ProductImageRepository;
-import com.rikkeisoft.canifashop.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +30,17 @@ public interface FileImageService {
 
 	ProductResponse storeFile(Long id, MultipartFile avatar, MultipartFile[] images);
 
+	UserResponse storeFileUser(Long id, MultipartFile avatar);
+
+	ProductCommentResponse storeFileComment(Long id, MultipartFile[] images);
+
 	Resource loadFileAsResource(String pathFile);
+
+	CategoryResponse storeFileCate(Long id, MultipartFile images);
+
+	PromotionResponse storeFilePromiton(Long id, MultipartFile images);
+
+
 
 }
 
@@ -42,11 +50,29 @@ class FileImageServiceImpl implements FileImageService {
 
 	private final ProductRepository productRepository;
 
+	private final ProductCommentRepository productCommentRepository;
+
 	private final ProductImageRepository productImageRepository;
+
+	private final ProductCommentImageRepository productCommentImageRepository;
 
 	private final ProductService productService;
 
 	private final Path root = Paths.get("uploads");
+
+	private final UserService userService;
+
+	private final UserRepository userRepository;
+
+	private final ProductCommentService productCommentService;
+
+	private final CategoryService categoryService;
+
+	private final CategoryRepository categoryRepository;
+
+	private final PromotionService promotionService;
+
+	private final PromotionRepository promotionRepository;
 
 	@Override
 	@Transactional
@@ -106,6 +132,8 @@ class FileImageServiceImpl implements FileImageService {
 		return null;
 	}
 
+
+
 	private boolean delete(String pathFile) {
 		return FileSystemUtils.deleteRecursively(new File(root + "/" + pathFile));
 	}
@@ -119,6 +147,56 @@ class FileImageServiceImpl implements FileImageService {
 			}
 
 			new File(root + "/" + entity.getId() + "/avatar").mkdirs();
+
+			Path targetLocation = this.root.resolve(path);
+			Files.copy(avatar.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+		} catch (IOException ex) {
+			throw new FileStorageException("Could not store file " + path + ". Please try again!");
+		}
+	}
+
+	@Override
+	@Transactional
+	public UserResponse storeFileUser(Long id, MultipartFile avatar) {
+
+		UserEntity entity = userService.getEntityById(id);
+
+		if (entity != null) {
+
+			String newFile = StringUtils.cleanPath(avatar.getOriginalFilename());
+
+			String newAvatar = id + "/avatarUser/" + newFile; // Tạo path lưu cho Avatar
+
+			// Lưu Avatar
+			if (!isEmptyUploadFile(avatar)) {
+				if (entity.getAvatar() != null) { // Nếu có ảnh trong product => xóa path ảnh đi vào cập nhật lại
+					if (this.delete(id + "/avatarUser/")) {
+						createImageAvatarUser(entity, newAvatar, avatar);
+					}
+				} else {
+					createImageAvatarUser(entity, newAvatar, avatar);
+				}
+				createImageAvatarUser(entity, newAvatar, avatar);
+			}
+
+
+
+			userRepository.save(entity);
+			return UserMapper.convertToResponse(entity);
+		} else {
+			return null;
+		}
+	}
+
+	private void createImageAvatarUser(UserEntity entity, String path, MultipartFile avatar) {
+		try {
+			entity.setAvatar(path);
+			if (path.contains("..")) {
+				throw new FileStorageException("Sorry! Filename contains invalid path sequence " + path);
+			}
+
+			new File(root + "/" + entity.getId() + "/avatarUser").mkdirs();
 
 			Path targetLocation = this.root.resolve(path);
 			Files.copy(avatar.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
@@ -151,6 +229,154 @@ class FileImageServiceImpl implements FileImageService {
 		}
 
 	}
+
+	//Tao list anh cho Comment
+
+	private void createListImagesComment(ProductCommentEntity entity, String path, MultipartFile[] images) {
+
+		new File(root + "/" + entity.getId() + "/comment_images").mkdirs();
+		try {
+			entity.setCommentImages(new HashSet<>());
+			for (MultipartFile image : images) {
+				String pathImage = path + StringUtils.cleanPath(image.getOriginalFilename());
+
+				if (path.contains("..")) {
+					throw new FileStorageException("Sorry! Filename contains invalid path sequence " + pathImage);
+				}
+				Path targetLocation = this.root.resolve(pathImage);
+				Files.copy(image.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+				ProductCommentImagesEntity imageEntity = ProductCommentImagesEntity.builder().path(pathImage).build();
+				entity.addProductCommentImageEntity(imageEntity);
+
+			}
+		} catch (IOException e) {
+			throw new FileStorageException("Could not store file " + path + ". Please try again!");
+		}
+
+	}
+
+	@Override
+	@Transactional
+	public ProductCommentResponse storeFileComment(Long id, MultipartFile[] images) {
+
+		ProductCommentEntity entity = productCommentService.getEntityById(id);
+
+		if (entity != null) {
+			String newImage = id + "/comment_images/"; // Tạo path lưu cho Images
+
+			// Lưu Images
+			if (!isEmptyUploadFile(images)) {
+				if (entity.getCommentImages() != null && !entity.getCommentImages().isEmpty()) {
+					productImageRepository.deleteByProductId(id);
+					if (this.delete(id + "/comment_images")) {
+						createListImagesComment(entity, newImage, images);
+					}
+				} else {
+					createListImagesComment(entity, newImage, images);
+				}
+			}
+
+			productCommentRepository.save(entity);
+			return ProductCommentMapper.convertToResponse(entity);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public CategoryResponse storeFileCate(Long id, MultipartFile images) {
+
+		CategoryEntity entity = categoryService.getEntityById(id);
+
+		if (entity != null) {
+
+			String newFile = StringUtils.cleanPath(images.getOriginalFilename());
+
+			String newAvatar = id + "/bannerCate/" + newFile; // Tạo path lưu cho Avatar
+
+			// Lưu Avatar
+			if (!isEmptyUploadFile(images)) {
+				if (entity.getAvatar() != null) { // Nếu có ảnh trong product => xóa path ảnh đi vào cập nhật lại
+					if (this.delete(id + "/bannerCate/")) {
+						createImageAvatarCate(entity, newAvatar, images);
+					}
+				} else {
+					createImageAvatarCate(entity, newAvatar, images);
+				}
+				createImageAvatarCate(entity, newAvatar, images);
+			}
+			categoryRepository.save(entity);
+			return CategoryMapper.convertToResponse(entity);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public PromotionResponse storeFilePromiton(Long id, MultipartFile images) {
+		PromotionEntity entity = promotionService.getEntityById(id);
+
+		if (entity != null) {
+
+			String newFile = StringUtils.cleanPath(images.getOriginalFilename());
+
+			String newAvatar = id + "/bannerPromotion/" + newFile; // Tạo path lưu cho Avatar
+
+			// Lưu Avatar
+			if (!isEmptyUploadFile(images)) {
+				if (entity.getAvatar() != null) { // Nếu có ảnh trong product => xóa path ảnh đi vào cập nhật lại
+					if (this.delete(id + "/bannerPromotion/")) {
+						createImageAvatarPromotion(entity, newAvatar, images);
+					}
+				} else {
+					createImageAvatarPromotion(entity, newAvatar, images);
+				}
+				createImageAvatarPromotion(entity, newAvatar, images);
+			}
+
+
+
+			promotionRepository.save(entity);
+			return PromotionMapper.convertToResponse(entity);
+		} else {
+			return null;
+		}
+	}
+	private void createImageAvatarPromotion(PromotionEntity entity, String path, MultipartFile avatar) {
+		try {
+			entity.setAvatar(path);
+			if (path.contains("..")) {
+				throw new FileStorageException("Sorry! Filename contains invalid path sequence " + path);
+			}
+
+			new File(root + "/" + entity.getId() + "/bannerPromotion").mkdirs();
+
+			Path targetLocation = this.root.resolve(path);
+			Files.copy(avatar.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+		} catch (IOException ex) {
+			throw new FileStorageException("Could not store file " + path + ". Please try again!");
+		}
+	}
+	private void createImageAvatarCate(CategoryEntity entity, String path, MultipartFile avatar) {
+		try {
+			entity.setAvatar(path);
+			if (path.contains("..")) {
+				throw new FileStorageException("Sorry! Filename contains invalid path sequence " + path);
+			}
+
+			new File(root + "/" + entity.getId() + "/bannerCate").mkdirs();
+
+			Path targetLocation = this.root.resolve(path);
+			Files.copy(avatar.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+		} catch (IOException ex) {
+			throw new FileStorageException("Could not store file " + path + ". Please try again!");
+		}
+	}
+
+
+	////////////////////////////
 
 	private boolean isEmptyUploadFile(MultipartFile[] files) {
 		if (files == null || files.length <= 0)

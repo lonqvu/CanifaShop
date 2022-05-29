@@ -63,6 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Audi
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.authorizeRequests().antMatchers(BASE_API + "/auth/**", BASE_API + "/guest/**").permitAll()
 				.antMatchers(BASE_API + "/admin/**").hasAuthority(RoleEnum.ROLE_ADMIN.toString())
+				.antMatchers(BASE_API + "/staff/**").hasAuthority(RoleEnum.ROLE_STAFF.toString())
 				.antMatchers(BASE_API + "/user/**").hasAuthority(RoleEnum.ROLE_USER.toString()).anyRequest()
 				.authenticated();
 
@@ -81,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Audi
 		try {
 			return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication().getName());
 		} catch (Exception ignored) {
-			return Optional.of("anonymousUser");
+			return Optional.of("SOMEONE");
 		}
 	}
 }

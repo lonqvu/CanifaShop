@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { CardProduct, Container } from '../base'
+import { CardProduct, Container, TextField, SimpleCard } from '../base'
 import {
     Grid,
     Card,
@@ -10,16 +10,28 @@ import {
     ImageList,
     ImageListItem,
     Box,
-    ButtonGroup,
+    Pagination,
     Radio,
     Stack,
     ToggleButton,
     ToggleButtonGroup,
     Link,
+    TableContainer,
+    Table,
+    TableBody,
+    TableRow,
+    Avatar,
+    TableCell,
 } from '@mui/material'
-import { ProductService, localStorageService, URL_IMG } from 'app/services'
+import {
+    ProductService,
+    localStorageService,
+    URL_IMG,
+    AuthService,
+} from 'app/services'
 import { textAlign } from '@mui/system'
 import { Dialog, Notify } from 'app/views/action'
+import { ValidatorForm } from 'react-material-ui-form-validator'
 
 const Item = styled(Card)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -28,41 +40,6 @@ const Item = styled(Card)(({ theme }) => ({
     textAlign: 'center',
     minHeight: '200px',
     color: '#000',
-}))
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    border: '1px solid #ccc',
-    backgroundColor: 'white',
-    marginLeft: 0,
-    width: '100%',
-}))
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}))
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: '12ch',
-            '&:focus': {
-                width: '20ch',
-            },
-        },
-    },
 }))
 
 const Detail = () => {
@@ -81,6 +58,22 @@ const Detail = () => {
     const [listImages, setListImages] = useState([])
 
     const [path, setPath] = useState('')
+    const [page, setPage] = useState(0)
+    const [totalPages, setTotalPages] = useState()
+    const [comments, setComments] = useState([])
+    const [count, setCount] = useState([])
+    const [auth, setAuth] = useState({})
+    const [id, setId] = useState(0)
+
+    const handleChangePage = (event, value) => {
+        setPage(value - 1)
+        ProductService.getComment(id, value - 1).then((response) => {
+            setComments(response.data.content)
+            const data = response.data
+            setPage(data.page)
+            setTotalPages(data.totalPages)
+        })
+    }
 
     const [confirmDialog, setConfirmDialog] = useState({
         isOpen: false,
@@ -93,11 +86,143 @@ const Detail = () => {
         message: '',
         type: '',
     })
+    const counts = (id) => {
+        ProductService.getCountProduct(id).then((res) => {
+            setCount(res.data)
+        })
+    }
 
     useEffect(() => {
         getProductBySeo(productSeo)
+        AuthService.infor()
+            .then((response) => {
+                const data = response.data.data
+                const user = { id: data.id, username: data.username }
+                setAuth(user)
+            })
+            .catch((error) => {
+                const response = error.response
+                setAuth(null)
+                if (
+                    response.status === 401 &&
+                    response.data.message === 'Access is denied'
+                ) {
+                    localStorageService.setItem('accessToken', null)
+                    navigate('/login')
+                }
+            })
     }, [])
+    const checkFomatFile = (e) => {
+        if (e.includes('.mp4')) {
+            return (
+                <div>
+                    <video src={URL_IMG + e} width="55px" controls></video>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <img src={URL_IMG + e} alt="" width="55px" />
+                </div>
+            )
+        }
+    }
 
+    const checkCommentNull = (cm) => {
+        if (cm.length == 0) {
+            return (
+                <div>
+                    <p>Không có bình luận nào</p>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <TableContainer>
+                        <Table
+                            sx={{ minWidth: 700 }}
+                            aria-label="customized table"
+                        >
+                            {cm.map((e) => (
+                                <TableBody key={e.id}>
+                                    <TableRow>
+                                        <Box
+                                            sx={{
+                                                backgroundColor: '',
+                                                padding: 2,
+                                                border: '1px solid black',
+                                                borderRadius: 10,
+                                                marginBottom: 2,
+                                            }}
+                                        >
+                                            <Stack direction="row" spacing={2}>
+                                                <Avatar
+                                                    alt="Remy Sharp"
+                                                    src={
+                                                        URL_IMG +
+                                                        e.userResponse.avatar
+                                                    }
+                                                />
+                                                <p
+                                                    style={{
+                                                        marginLeft: 15,
+                                                        fontSize: 15,
+                                                    }}
+                                                >
+                                                    {e.userResponse.username}
+                                                    <p
+                                                        style={{
+                                                            fontSize: 12,
+                                                            opacity: '50%',
+                                                        }}
+                                                    >
+                                                        {e.createdAt}
+                                                    </p>
+                                                </p>
+                                            </Stack>
+
+                                            <Stack
+                                                direction="row"
+                                                spacing={2}
+                                                style={{ marginLeft: 55 }}
+                                            >
+                                                <p>{e.content}</p>
+                                            </Stack>
+                                            <Stack
+                                                direction="row"
+                                                spacing={2}
+                                                style={{
+                                                    marginLeft: 55,
+                                                }}
+                                            >
+                                                <TableContainer>
+                                                    <TableBody>
+                                                        {e.listImages.map(
+                                                            (img) => (
+                                                                <TableCell
+                                                                    style={{
+                                                                        marginRight: 5,
+                                                                    }}
+                                                                >
+                                                                    {checkFomatFile(
+                                                                        img
+                                                                    )}
+                                                                </TableCell>
+                                                            )
+                                                        )}
+                                                    </TableBody>
+                                                </TableContainer>
+                                            </Stack>
+                                        </Box>
+                                    </TableRow>
+                                </TableBody>
+                            ))}
+                        </Table>
+                    </TableContainer>
+                </div>
+            )
+        }
+    }
     const getProductBySeo = (productSeo) => {
         ProductService.getProductBySeo(productSeo)
             .then((response) => {
@@ -108,6 +233,17 @@ const Detail = () => {
                 setListColors(product.listColors)
                 setSize(listSizes)
                 setListSizes(product.listColors[0].listSizes)
+                setId(response.data.data.id)
+                counts(response.data.data.id)
+                ProductService.getComment(response.data.data.id, page).then(
+                    (response) => {
+                        setComments(response.data.content)
+                        const data = response.data
+                        setPage(data.page)
+                        setTotalPages(data.totalPages)
+                        console.log(response.data.content)
+                    }
+                )
             })
             .catch((error) => {
                 console.log(error)
@@ -176,6 +312,44 @@ const Detail = () => {
             type: 'success',
         })
     }
+
+    const discount = (x) => {
+        if (x == 0) {
+            return (
+                <p style={{
+                    fontSize: 20,
+                    fontWeight: 300,
+                    width: '100%',
+                    textAlign: 'left',
+                }}>
+                    {product.price?.toLocaleString('vi-VN', {
+                        style: 'currency',
+                        currency: 'VND',
+                    })}
+                </p>
+            )
+        } else {
+            return (
+                <div>
+                    <del style={{ fontSize: '20px', marginRight: '10px' }}>
+                        {product.price?.toLocaleString('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                        })}
+                    </del>
+                    <label style={{ fontSize: '20px', fontWeight: 600 }}>
+                        {(
+                            product.price -
+                            product.price * (x / 100)
+                        ).toLocaleString('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                        })}
+                    </label>
+                </div>
+            )
+        }
+    }
     return (
         <Container>
             <Grid
@@ -186,7 +360,7 @@ const Detail = () => {
                 paddingBottom={7.5}
                 paddingTop={2}
             >
-                <Grid item xs={12}>
+                <Grid item xs={12} sm={12}>
                     <Item sx={{ flexGrow: 1 }}>
                         <Grid
                             container
@@ -257,15 +431,17 @@ const Detail = () => {
                                         justifyContent="start"
                                     >
                                         <p
-                                            style={{
-                                                fontSize: 25,
-                                                fontWeight: 300,
-                                                width: '100%',
-                                                textAlign: 'left',
-                                            }}
+                                            
                                         >
-                                            {product.price} đ
+                                            {discount(product.discount)}
+                                            
                                         </p>
+                                    </Stack>
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                    >
+                                        <p>Đã bán {count}</p>
                                     </Stack>
                                     <hr style={{ opacity: 0.5 }} />
                                     <Stack
@@ -370,24 +546,127 @@ const Detail = () => {
                                             THÊM VÀO GIỎ HÀNG
                                         </Button>
                                     </Stack>
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 500,
+                                            fontSize: 20,
+                                            opacity: '95%',
+                                            marginTop: '15px',
+                                        }}
+                                    >
+                                        Mô tả
+                                    </Stack>
 
                                     <Stack
                                         direction="row"
-                                        justifyContent="center"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 200,
+                                            fontSize: 15,
+                                            opacity: '80%',
+                                        }}
                                     >
-                                        <Button
-                                            variant="contained"
-                                            color="inherit"
-                                            style={{ width: '100%' }}
-                                            onClick={()=>console.log(product.id)}
-                                        >
-                                            Thêm vào sản phẩm yêu thích
-                                        </Button>
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: product.desciption,
+                                            }}
+                                        ></div>
+                                    </Stack>
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 500,
+                                            fontSize: 20,
+                                            opacity: '95%',
+                                            marginTop: '15px',
+                                        }}
+                                    >
+                                        Chất liệu
+                                    </Stack>
+
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 200,
+                                            fontSize: 15,
+                                            opacity: '80%',
+                                        }}
+                                    >
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: product.material,
+                                            }}
+                                        ></div>
+                                    </Stack>
+
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 500,
+                                            fontSize: 20,
+                                            opacity: '95%',
+                                            marginTop: '15px',
+                                        }}
+                                    >
+                                        Hướng dẫn sử dụng
+                                    </Stack>
+
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 200,
+                                            fontSize: 15,
+                                            opacity: '80%',
+                                        }}
+                                    >
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: product.tutorial,
+                                            }}
+                                        ></div>
                                     </Stack>
                                 </Box>
                             </Grid>
                         </Grid>
                     </Item>
+                </Grid>
+                <Grid
+                    container
+                    maxWidth="1600px"
+                    margin="auto"
+                    spacing={1}
+                    paddingBottom={7.5}
+                    paddingTop={2}
+                >
+                    <Grid item xs={12}>
+                        <SimpleCard height="auto" title="Bình luận">
+                            {checkCommentNull(comments)}
+                            <Stack spacing={2} paddingTop={3} paddingBottom={1}>
+                                <Box
+                                    my={2}
+                                    display="flex"
+                                    justifyContent="center"
+                                >
+                                    <Pagination
+                                        count={totalPages}
+                                        page={page + 1}
+                                        onChange={handleChangePage}
+                                        variant="outlined"
+                                        color="primary"
+                                        showFirstButton
+                                        showLastButton
+                                    />
+                                </Box>
+                            </Stack>
+                        </SimpleCard>
+                    </Grid>
+                    <Grid item xs={12}></Grid>
                 </Grid>
                 <>
                     <Dialog

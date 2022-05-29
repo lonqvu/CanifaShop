@@ -7,10 +7,12 @@ import com.rikkeisoft.canifashop.presentation.request.CategoryRequest;
 import com.rikkeisoft.canifashop.presentation.response.CategoryResponse;
 import com.rikkeisoft.canifashop.service.CategoryService;
 
+import com.rikkeisoft.canifashop.service.FileImageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "${domain.origins}")
 @RestController
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoryAdminController extends BaseController {
 
 	private final CategoryService categoryService;
+	private final FileImageService fileImageService;
 	
 	@GetMapping
 	public ResponseEntity<BasePagerData<CategoryResponse>> getCategoryByPaging(
@@ -52,6 +55,18 @@ public class CategoryAdminController extends BaseController {
 	public ResponseEntity<BaseResponseEntity> deleteCategory(@PathVariable("id") Long id) {
 		categoryService.deleteById(id);
 		return success("Delete category successful");
+	}
+
+	@GetMapping("/parent")
+	public ResponseEntity<BaseResponseEntity> getCategoryParent() {
+		return success(categoryService.getCategoryParent(), "Get categories parent successful");
+	}
+
+	@PostMapping("/uploadfile/{id}")
+	public ResponseEntity<BaseResponseEntity> uploadFile(@PathVariable("id") Long id,
+														 @RequestParam("avatar") MultipartFile avatar) {
+
+		return created(fileImageService.storeFileCate(id, avatar), "Create images of category successful");
 	}
 
 }

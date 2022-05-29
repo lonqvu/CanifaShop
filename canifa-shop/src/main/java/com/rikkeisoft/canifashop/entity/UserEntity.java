@@ -30,6 +30,9 @@ import lombok.Setter;
 @Table(name = "tbl_users")
 public class UserEntity extends BaseEntity {
 
+	@Column
+	private String avatar;
+
 	@Column(length = 50, nullable = false, unique = true)
 	private String username;
 
@@ -54,6 +57,12 @@ public class UserEntity extends BaseEntity {
 	
 	@Column(name = "locked")
 	private Boolean locked;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity")
+	private Set<ProductCommentEntity> productCommentEntities;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity")
+	private Set<FavoriteProductEntity> favoriteProductEntities;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "userEntity")
 	private Set<OrderEntity> orderEntities;

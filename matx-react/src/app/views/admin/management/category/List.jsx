@@ -11,12 +11,15 @@ import {
     TableContainer,
     Paper,
     Pagination,
+    styled,
     Stack
 } from '@mui/material'
 import { Container, SearchContainer, SearchInput, StyledTableRow, StyledTableCell, Breadcrumb, SimpleCard } from '../../base'
-import { CategoryService } from 'app/services'
+import { CategoryService, URL_IMG } from 'app/services'
 import { Notify, AlertDialog, showError} from 'app/views/action'
-
+const IMG = styled('img')(() => ({
+    width: 75,
+}))
 
 const List = () => {
 
@@ -117,6 +120,7 @@ const List = () => {
                             <TableHead>
                                 <TableRow>
                                     <StyledTableCell align="center" width="50px">STT</StyledTableCell>
+                                    <StyledTableCell align="center">Avatar</StyledTableCell>
                                     <StyledTableCell align="center">Tên danh mục</StyledTableCell>
                                     <StyledTableCell align="center">Danh mục cha</StyledTableCell>
                                     <StyledTableCell align="center" width="175px">Hành động</StyledTableCell>
@@ -126,6 +130,7 @@ const List = () => {
                                 {content.map((category, index) => (
                                     <StyledTableRow key={category.id}>
                                         <StyledTableCell align="center">{++index + ((page) * size)}</StyledTableCell>
+                                        <StyledTableCell align="center"><IMG src={URL_IMG + category.avatar} /></StyledTableCell>
                                         <StyledTableCell align="center">{category.name}</StyledTableCell>
                                         <StyledTableCell align="center">{displayParent(category.parent)}</StyledTableCell>
                                         <StyledTableCell align="center">

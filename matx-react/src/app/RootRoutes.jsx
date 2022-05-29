@@ -10,11 +10,19 @@ import categoryAdminRoute from './views/admin/management/category/CategorytRoute
 import orderAdminRoute from './views/admin/management/order/OrderRoutes'
 import containerRoute from './views/user/container/ContainerRoutes'
 
+import homeStaffRoute from 'app/views/staff/dashboard/home/HomeRoutes'
+import statisticalStaffRoute from 'app/views/staff/dashboard/statistical/StatisticalRoutes'
+import orderStaffRoute from 'app/views/staff/management/order/OrderRoutes'
 const redirectRoute = [
     {
         path: '/admin/home',
         exact: true,
         component: () => <Redirect to="/admin/home" />,
+    },
+    {
+        path: '/staff/home',
+        exact: true,
+        component: () => <Redirect to="/staff/home" />,
     },
 ]
 
@@ -25,6 +33,7 @@ const errorRoute = [
 ]
 
 const routes = [
+    
     ...homeAdminRoute,
     ...categoryAdminRoute,
     ...colorAdminRoute,
@@ -34,7 +43,10 @@ const routes = [
     ...containerRoute,
     ...statisticalRoutes,
     ...redirectRoute,
-    ...errorRoute
+    ...errorRoute,
+    ...statisticalStaffRoute,
+    ...homeStaffRoute,
+    ...orderStaffRoute,
 ]
 
 export default routes

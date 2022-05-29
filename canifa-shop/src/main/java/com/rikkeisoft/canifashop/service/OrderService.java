@@ -6,6 +6,7 @@ import com.rikkeisoft.canifashop.entity.*;
 import com.rikkeisoft.canifashop.presentation.mapper.OrderMapper;
 import com.rikkeisoft.canifashop.presentation.request.OrderRequest;
 import com.rikkeisoft.canifashop.presentation.response.OrderResponse;
+import com.rikkeisoft.canifashop.presentation.response.RevenueByResponse;
 import com.rikkeisoft.canifashop.presentation.response.statisticalReponse;
 import com.rikkeisoft.canifashop.repository.*;
 
@@ -14,12 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,9 +46,30 @@ public interface OrderService {
 
 	List<statisticalReponse> getRevenueByYear(Integer year);
 
+	List<statisticalReponse> getRevenueByProduct(Integer year, String name);
+
 	BasePagerData<OrderResponse> getOrderByMonth(Integer page, Integer size, Integer year, Integer month);
 
   	OrderResponse getByCode(String code);
+
+  	List<RevenueByResponse> RevenueByTop5(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByTop5Cate(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByQuantity(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByCate(Long startDate, Long endDate, Long parentId);
+
+	List<RevenueByResponse> RevenueByTop10User(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByReturn(Long startDate, Long endDate);
+
+	Integer Return(String status, Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByQuantityOrderComplete(Long startDate, Long endDate);
+
+	List<RevenueByResponse> RevenueByQuantityOrderCancel(Long startDate, Long endDate);
+
 
 }
 
@@ -56,11 +80,13 @@ class OrderServiceImpl implements OrderService {
 	private final PromotionRepository promotionRepository;
 	private final UserRepository userRepository;
 	private final ProductDetailRepository productDetailRepository;;
+	private final ProductService productService;
+
 
 	@Override
 	public BasePagerData<OrderResponse> getOrdersByPaging(Integer page, Integer size, String keyword) {
 
-		Pageable paging = PageRequest.of(page, size);
+		Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
 
 		if (keyword.equals("-1") || keyword.isEmpty()) {
 			keyword = null;
@@ -102,15 +128,16 @@ class OrderServiceImpl implements OrderService {
 		if (userEntity != null) {
 			orderEntity.setUserEntity(userEntity);
 		}
+
 		if (promotionEntity != null) {
 			orderEntity.setPromotionEntity(promotionEntity);
 		}
 		orderEntity.setOrderDetailEntities(new HashSet<>());
-
 		orderRequest.getListOrderDetailsRequest().forEach(id -> {
 			ProductDetailEntity productDetailEntity = productDetailRepository.findByListId(id.getColorId(),
 					id.getProductId(), id.getSizeId());
-			OrderDetailEntity orderDetailEntity = OrderDetailEntity.builder().quantity(id.getQuantity())
+			ProductEntity productEntity = productService.getEntityById(id.getProductId());
+			OrderDetailEntity orderDetailEntity = OrderDetailEntity.builder().avatar(productEntity.getAvatar()).quantity(id.getQuantity())
 					.productDetailEntity(productDetailEntity).price(BigDecimal.valueOf(5.4)).build();
 			orderEntity.addOrderDetailEntity(orderDetailEntity);
 		});
@@ -175,6 +202,11 @@ class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
+	public List<statisticalReponse> getRevenueByProduct(Integer year, String name) {
+		return orderRepository.StatisticalByProductAndYear(year,name);
+	}
+
+	@Override
 	public BasePagerData<OrderResponse> getOrderByMonth(Integer page, Integer size, Integer year, Integer month) {
 		Pageable paging = PageRequest.of(page, size);
 
@@ -185,6 +217,105 @@ class OrderServiceImpl implements OrderService {
 	public OrderResponse getByCode(String code) {
 		OrderEntity orderEntity = orderRepository.findByCode(code);
 		return OrderMapper.convertToResponse(orderEntity);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByTop5(Long startDate, Long endDate){
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByTop5(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByTop5Cate(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByTop5Cate(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByQuantity(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByQuantity(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByCate(Long startDate, Long endDate, Long parentId) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByCate(startTime, endTime, parentId);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByTop10User(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByTop10User(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByReturn(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByReturn(startTime, endTime);
+	}
+
+	@Override
+	public Integer Return(String status, Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.Return(status ,startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByQuantityOrderComplete(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByQuantityOrderComplete(startTime, endTime);
+	}
+
+	@Override
+	public List<RevenueByResponse> RevenueByQuantityOrderCancel(Long startDate, Long endDate) {
+		Date start = new Date(startDate);
+		LocalDateTime startTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		Date end = new Date(endDate);
+		LocalDateTime endTime = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+		return orderRepository.RevenueByQuantityOrderCancel(startTime, endTime);
 	}
 
 }

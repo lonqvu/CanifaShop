@@ -20,6 +20,7 @@ const AppForm = () => {
     const [startDate, setStartDate] = useState(new Date())
     const [endDate, setEndDate] = useState(new Date())
     const navigate = useNavigate()
+    const [avatar, setAvatar]= useState()
     const { id } = useParams();
     const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
 
@@ -30,6 +31,7 @@ const AppForm = () => {
 
         if (id !== "add") {
             PromotionService.updatePromotionAdmin(id, promotion).then((response) => {
+                PromotionService.createAvatar(response.data.data.id, avatar)
                 window.setTimeout(function () {
                     window.location.href = '/admin/promotion/list';
                 }, 1000);
@@ -48,6 +50,7 @@ const AppForm = () => {
             })
         } else {
             PromotionService.createPromotionAdmin(promotion).then((response) => {
+                PromotionService.createAvatar(response.data.data.id, avatar)
                 window.setTimeout(function () {
                     window.location.href = '/admin/promotion/list';
                 }, 1000);
@@ -79,7 +82,9 @@ const AppForm = () => {
             console.log(error)
         })
     }, [])
-
+    const handleAvatar = (e) => {
+        setAvatar(e.target.files[0])
+    }
     const title = (id) => {
         if (id === 'add') {
             return "Tạo mới khuyến mại"
@@ -99,6 +104,11 @@ const AppForm = () => {
                     <ValidatorForm onSubmit={saveOrUpdate} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
+                            <p>Chọn avatar <input
+                                    type="file"
+                                    onChange={handleAvatar}
+                                    src={avatar}
+                                /></p>
                                 <TextField
                                     type="text"
                                     name="name"

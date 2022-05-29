@@ -4,6 +4,7 @@ import com.rikkeisoft.canifashop.entity.UserAddressEntity;
 
 import java.util.List;
 
+import com.rikkeisoft.canifashop.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,5 +23,7 @@ public interface UserAddressRepository extends JpaRepository<UserAddressEntity, 
 	@Modifying
 	@Query(value = "UPDATE tbl_user_address SET is_default = 0 WHERE user_id = :userId", nativeQuery = true)
 	void setNotDefaultForAddress(@Param("userId") Long userId);
+
+
 	
 }

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${base.api}/user/cart")
 @RequiredArgsConstructor
 public class CartController extends BaseController {
-	private final OrderService orderService;
+	public final OrderService orderService;
 
 	@GetMapping("/{username}")
 	public ResponseEntity<BaseResponseEntity> filterOrderByStatus(@PathVariable("username") String username,

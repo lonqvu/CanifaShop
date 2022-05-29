@@ -1,6 +1,6 @@
 export const navigations = [
     {
-        label: 'Dashboard',
+        label: 'Dành cho quản lý',
         type: 'label',
     },
     {
@@ -13,10 +13,7 @@ export const navigations = [
         path: '/admin/statistical',
         icon: 'trending_up',
     },
-    {
-        label: 'Quản lý',
-        type: 'label',
-    },
+   
     {
         name: 'Danh mục',
         path: '/admin/category/list',
@@ -47,4 +44,5 @@ export const navigations = [
         path: '/admin/order/list',
         icon: 'shopping_cart',
     },
+
 ]

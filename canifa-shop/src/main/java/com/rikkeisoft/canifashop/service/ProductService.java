@@ -9,13 +9,16 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import com.rikkeisoft.canifashop.entity.*;
+import com.rikkeisoft.canifashop.presentation.mapper.CategoryMapper;
 import com.rikkeisoft.canifashop.presentation.mapper.OrderMapper;
 import com.rikkeisoft.canifashop.presentation.request.ColorSizeRequest;
 import com.rikkeisoft.canifashop.entity.CategoryEntity;
+import com.rikkeisoft.canifashop.presentation.response.CategoryResponse;
 import com.rikkeisoft.canifashop.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.github.slugify.Slugify;
 import com.rikkeisoft.canifashop.base.BasePagerData;
@@ -54,6 +57,10 @@ public interface ProductService {
 //	ProductResponse listFavourite(ProductRequest productRequest);
 //
 //	UserEntity getUserEntityById(Long id);
+
+	List<ProductResponse> getByCate(Long id);
+
+	List<ProductResponse> getProductParentBoy();
 }
 
 @Service
@@ -66,7 +73,11 @@ class ProductServiceImpl implements ProductService {
 	private final ColorService colorService;
 	private final SizeService sizeService;
 	private final UserRepository userRepository;
-
+	@Override
+	public List<ProductResponse> getProductParentBoy() {
+		return productRepository.getAllProductParentBoy().stream().map(e -> ProductMapper.convertToResponse(e))
+				.collect(Collectors.toList());
+	}
 	@Override
 	public List<ProductResponse> getAll() {
 		List<ProductEntity> productEntities = productRepository.findAll();
@@ -75,7 +86,7 @@ class ProductServiceImpl implements ProductService {
 
 	@Override
 	public BasePagerData<ProductResponse> getProductsByPaging(Integer page, Integer size, String keyword) {
-		Pageable paging = PageRequest.of(page, size);
+		Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
 		if (keyword.equals("-1") || keyword.isEmpty()) {
 			keyword = null;
 		}
@@ -190,16 +201,12 @@ class ProductServiceImpl implements ProductService {
 		}
 	}
 
-//	@Override
-//	public ProductResponse listFavourite(ProductRequest productRequest) {
-//		UserEntity userEntity = this.getUserEntityById(productRequest.getUserId());
-//		ProductEntity productEntity = ProductMapper.convertToEntity(productRequest);
-//		productEntity.setSeo(new Slugify().slugify(productRequest.getName()));
-//		if(userEntity!=null){
-//			productEntity.setUserEntities(userEntity);
-//		}
-//		return ProductMapper.convertToResponse(productRepository.save(productEntity));
-//	}
+	@Override
+	public List<ProductResponse> getByCate(Long id) {
+		List<ProductEntity> productEntities = productRepository.findByCate(id);
+		return productEntities.stream().map(e -> ProductMapper.convertToResponse(e)).collect(Collectors.toList());
+	}
+
 
 	private void createProductDetail(ProductEntity product, List<ColorSizeRequest> listColors) {
 		product.setProductDetailEntities(new HashSet<>());

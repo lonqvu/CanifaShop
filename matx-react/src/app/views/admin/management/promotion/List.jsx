@@ -9,14 +9,18 @@ import {
     Icon,
     TableRow,
     TableContainer,
+    styled,
     Paper,
     Pagination,
     Stack
 } from '@mui/material'
 import { Container, SearchContainer,SearchInput, StyledTableRow, StyledTableCell, Breadcrumb, SimpleCard } from '../../base'
-import { PromotionService } from 'app/services'
+import { PromotionService, URL_IMG } from 'app/services'
 import Notify from 'app/views/action/Notify'
 import AlertDialog from 'app/views/action/Confirm'
+const IMG = styled('img')(() => ({
+    width: 75,
+}))
 
 const List = () => {
 
@@ -115,6 +119,7 @@ const List = () => {
                         <TableHead>
                             <TableRow>
                                 <StyledTableCell align="center" width="50px">STT</StyledTableCell>
+                                <StyledTableCell align="center">Avatar</StyledTableCell>
                                 <StyledTableCell align="center">Tên khuyến mại</StyledTableCell>
                                 <StyledTableCell align="center">Giảm giá (%)</StyledTableCell>
                                 <StyledTableCell align="center">Ngày bắt đầu</StyledTableCell>
@@ -127,6 +132,7 @@ const List = () => {
                             {content.map((promotion, index) => (
                                 <StyledTableRow key={promotion.id}>
                                     <StyledTableCell align="center">{++index+((page) * size)}</StyledTableCell>
+                                    <StyledTableCell align="center"><IMG src={URL_IMG + promotion.avatar}></IMG></StyledTableCell>
                                     <StyledTableCell align="center">{promotion.name}</StyledTableCell>
                                     <StyledTableCell align="center">{promotion.discountPercent}%</StyledTableCell>
                                     <StyledTableCell align="center">{promotion.startDate}</StyledTableCell>

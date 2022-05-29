@@ -40,6 +40,8 @@ public class AuthController extends BaseController {
 	private final UserDetailsService detailsService;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final UserService userService;
+	private final UserDetailsService userDetailsService;
+
 
 	@GetMapping("/infor")
 	public ResponseEntity<BaseResponseEntity> getInforUser(HttpServletRequest request) {
