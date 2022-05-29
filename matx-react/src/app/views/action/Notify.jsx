@@ -26,7 +26,7 @@ export default function Notify(props) {
                 onClose = {HandleClose}
                 >
                 <Alert variant="filled"
-                 style={{ padding:'20px 20px', width:'300px'}}
+                 style={{ padding:'20px 20px', width:'auto'}}
                     severity={notify.type}
                     onClose = {HandleClose}
                 >

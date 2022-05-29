@@ -6,7 +6,6 @@ import 'perfect-scrollbar/css/perfect-scrollbar.css'
 import * as serviceWorker from './serviceWorker'
 import { StyledEngineProvider } from '@mui/styled-engine'
 import { CssBaseline } from '@mui/material'
-
 ReactDOM.render(
     <StyledEngineProvider injectFirst>
         <BrowserRouter>

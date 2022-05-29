@@ -22,6 +22,7 @@ import {
     DialogContent,
     DialogTitle,
 } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 import {
     TextField,
     SimpleCard,
@@ -35,11 +36,14 @@ import {
     URL_IMG,
     AuthService,
     OrderService,
+    UserAddressService,
+    UserService,
 } from 'app/services'
 import { hasProductInList, createListCart } from 'app/views/action'
 import dataVietNam from 'app/db/db.vietnam.json'
-import { Notify, AlertDialog, showError } from 'app/views/action'
+import { Notify } from 'app/views/action'
 import PromotionService from '../../../services/PromotionService'
+import { disConnect } from 'echarts'
 // const Item = styled(Card)(({ theme }) => ({
 //     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
 //     ...theme.typography.body2,
@@ -100,7 +104,10 @@ const AppUser = () => {
     const [totalCost, setTotalCost] = useState(0)
     const [totalOrder, setTotalOrder] = useState(0)
     const [discount, setDiscount] = useState(0)
+    const [promotionId, setPromotionId] = useState(0)
     const [userId, setUserId] = useState()
+    const [auth, setAuth] = useState({})
+    const navigate = useNavigate()
 
     const listCity = dataVietNam.city
     const [listDistrict, setListDistrict] = useState(dataVietNam.district[0])
@@ -108,9 +115,10 @@ const AppUser = () => {
     const [city, setCity] = useState()
     const [district, setDistrict] = useState()
     const [ward, setWard] = useState()
-    const [detailAddress, setDetailAddress] = useState()
-    const [stateAddress, setStateAddress] = useState('Vui lòng nhập đia chỉ')
+    const [detailAddress, setDetailAddress] = useState(null)
+    const [stateAddress, setStateAddress] = useState()
     const [openAddress, setOpenAddress] = useState(false)
+    const [ship, setShip] = useState(0)
     const [notify, setNotify] = useState({
         isOpen: false,
         message: '',
@@ -120,7 +128,17 @@ const AppUser = () => {
 
     const [promotion, setPromition] = useState([])
 
+    const [listAddress, setListAddress] = useState([])
+
+    const [kh, setKh] = useState()
+
     const handleChangeOrder = ({ target: { name, value } }) => {
+        setStateOrder({
+            ...stateOrder,
+            [name]: value,
+        })
+    }
+    const handleChangeOrder1 = ({ name, value }) => {
         setStateOrder({
             ...stateOrder,
             [name]: value,
@@ -149,7 +167,290 @@ const AppUser = () => {
         PromotionService.getAllPromotions().then((response) => {
             setPromition(response.data.data)
         })
+        AuthService.infor()
+            .then((response) => {
+                const data = response.data.data
+                const user = { id: data.id, username: data.username }
+                UserService.getUserByUsername(data.username).then((res) => {
+                    setKh(res.data.data)
+                })
+
+                UserAddressService.getAddressByUsername(data.username).then(
+                    (res) => {
+                        setListAddress(res.data.data)
+                        setStateAddress(
+                            res.data.data[0].detail +
+                                ', ' +
+                                res.data.data[0].ward +
+                                ', ' +
+                                res.data.data[0].district +
+                                ', ' +
+                                res.data.data[0].city
+                        )
+                    }
+                )
+            })
+            .catch((error) => {
+                const response = error.response
+                setAuth(null)
+                if (
+                    response.status === 401 &&
+                    response.data.message === 'Access is denied'
+                ) {
+                    localStorageService.setItem('accessToken', null)
+                    navigate('/login')
+                }
+            })
     }, [])
+    const title = () => {
+        return 'Địa chỉ giao hàng'
+    }
+
+    const Show = () => {
+        const list = localStorageService.getItem('accessToken')
+        if (list == null) {
+            return (
+                <div>
+                    <Grid container xs={12} spacing={1.5}>
+                        <Grid item xs={4} sx={{ mt: 2, margin: 0 }}>
+                            <TextField
+                                type="text"
+                                onChange={handleChangeOrder}
+                                name="customerName"
+                                value={stateOrder.customerName}
+                                label="Họ tên"
+                                validators={['required']}
+                                errorMessages={['Vui lòng nhập họ tên']}
+                            />
+                        </Grid>
+                        <Grid item xs={4} sx={{ mt: 2, margin: 0 }}>
+                            <TextField
+                                type="text"
+                                onChange={handleChangeOrder}
+                                name="customerPhone"
+                                value={stateOrder.customerPhone}
+                                label="Số điện thoại"
+                                validators={['required']}
+                                errorMessages={['Vui lòng nhập số điện thoại']}
+                            />
+                        </Grid>
+                        <Grid item xs={4} sx={{ mt: 2, margin: 0 }}>
+                            <TextField
+                                type="text"
+                                onChange={handleChangeOrder}
+                                name="customerEmail"
+                                value={stateOrder.customerEmail}
+                                label="Địa chỉ email"
+                                validators={['required']}
+                                errorMessages={['Vui lòng nhập email']}
+                            />
+                        </Grid>
+                        <Grid
+                            item
+                            xs={12}
+                            sx={{ mt: 2, margin: 0 }}
+                            display="flex"
+                            alignItems="center"
+                        >
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                sx={{
+                                    width: '120px',
+                                    marginBottom: '16px',
+                                }}
+                                onClick={handleOpenAddress}
+                            >
+                                Nhập địa chỉ
+                            </Button>
+                            <TextField
+                                sx={{
+                                    width: '655px',
+                                    marginLeft: '16px',
+                                }}
+                                type="text"
+                                name="stateAddress"
+                                value={stateAddress}
+                                label="Địa chỉ"
+                                disabled
+                            />
+                        </Grid>
+                        <Dialog
+                            open={openAddress}
+                            onClose={handleCreateAddress}
+                            sx={{
+                                '& .MuiDialog-container': {
+                                    '& .MuiPaper-root': {
+                                        width: '100%',
+                                        maxWidth: '500px',
+                                    },
+                                },
+                            }}
+                        >
+                            <DialogTitle>Chọn địa chỉ nhận hàng</DialogTitle>
+                            <DialogContent>
+                                <Autocomplete
+                                    disablePortal
+                                    options={listCity}
+                                    getOptionLabel={(listCity) => listCity.name}
+                                    onChange={(event, city) => {
+                                        setAddress(city, null, null)
+                                    }}
+                                    value={city}
+                                    sx={{
+                                        width: '100%',
+                                        marginTop: '16px',
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Tỉnh/Thành phố"
+                                        />
+                                    )}
+                                />
+                                <Autocomplete
+                                    disablePortal
+                                    options={listDistrict}
+                                    getOptionLabel={(listDistrict) =>
+                                        listDistrict.name
+                                    }
+                                    onChange={(event, district) => {
+                                        setAddress(null, district, null)
+                                    }}
+                                    value={district}
+                                    sx={{ width: '100%' }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Quận/Huyện"
+                                        />
+                                    )}
+                                />
+                                <Autocomplete
+                                    disablePortal
+                                    options={listWard}
+                                    getOptionLabel={(listWard) => listWard.name}
+                                    onChange={(event, ward) => {
+                                        setAddress(null, null, ward)
+                                    }}
+                                    value={ward}
+                                    sx={{ width: '100%' }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Phường/Xã"
+                                        />
+                                    )}
+                                />
+                                <TextField
+                                    type="text"
+                                    value={detailAddress}
+                                    onChange={(e) => {
+                                        setDetailAddress(e.target.value)
+                                    }}
+                                    name="detailAddress"
+                                    label="Địa chỉ"
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button
+                                    variant="contained"
+                                    color="success"
+                                    onClick={handleCreateAddress}
+                                >
+                                    Hoàn tất
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                        <Grid item xs={12} sx={{ mt: 2, margin: 0 }}>
+                            <TextField
+                                type="text"
+                                onChange={handleChangeOrder}
+                                name="note"
+                                value={stateOrder.note}
+                                label="Ghi chú"
+                            />
+                        </Grid>
+                    </Grid>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <Grid container xs={12} spacing={1.5}>
+                        <Grid item xs={4} sx={{ mt: 2, margin: 0 }}>
+                            <TextField
+                                type="text"
+                                onChange={handleChangeOrder}
+                                name="customerName"
+                                value={stateOrder.customerName}
+                                label="Họ tên"
+                            />
+                        </Grid>
+                        <Grid item xs={4} sx={{ mt: 2, margin: 0 }}>
+                            <TextField
+                                type="text"
+                                onChange={handleChangeOrder}
+                                name="customerPhone"
+                                value={stateOrder.customerPhone}
+                                label="Số điện thoại"
+                            />
+                        </Grid>
+                        <Grid item xs={4} sx={{ mt: 2, margin: 0 }}>
+                            <TextField
+                                type="text"
+                                onChange={handleChangeOrder}
+                                name="customerEmail"
+                                value={stateOrder.customerEmail}
+                                label="Địa chỉ email"
+                            />
+                        </Grid>
+                        <Autocomplete
+                            options={listAddress}
+                            getOptionLabel={(listAddress) =>
+                                listAddress.detail +
+                                ', ' +
+                                listAddress.ward +
+                                ', ' +
+                                listAddress.district +
+                                ', ' +
+                                listAddress.city
+                                    ? listAddress.detail +
+                                      ', ' +
+                                      listAddress.ward +
+                                      ', ' +
+                                      listAddress.district +
+                                      ', ' +
+                                      listAddress.city
+                                    : ''
+                            }
+                            onChange={(event, listAddress) => {
+                                const x =
+                                    listAddress.detail +
+                                    ', ' +
+                                    listAddress.ward +
+                                    ', ' +
+                                    listAddress.district +
+                                    ', ' +
+                                    listAddress.city
+                                setStateAddress(x)
+                                getShip(listAddress.city)
+                            }}
+                            sx={{ width: '100%' }}
+                            // value={ stateAddress}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Địa chỉ nhận hàng"
+                                    // required
+                                />
+                            )}
+                        />
+                    </Grid>
+                </div>
+            )
+        }
+    }
 
     const getData = () => {
         const list = localStorageService.getItem('listCart')
@@ -157,7 +458,7 @@ const AppUser = () => {
             setListCart(list)
             let total = 0
             list.forEach((p) => {
-                total += p.price * p.quantity
+                total += (p.price - p.price * (p.discount / 100)) * p.quantity
             })
             setTotalCost(total)
             setTotalOrder(list.length)
@@ -191,7 +492,13 @@ const AppUser = () => {
         createListCart(listCart)
         getData()
     }
-
+    const getShip = (city) => {
+        dataVietNam.city.map((e) => {
+            if (e.name === city) {
+                setShip(e.ship)
+            }
+        })
+    }
     const setAddress = (city, district, ward) => {
         if (city) {
             setListDistrict(
@@ -213,26 +520,60 @@ const AppUser = () => {
     }
     const createOrder = () => {
         stateOrder.customerAddress = stateAddress
-        stateOrder.userId = userId
-        stateOrder.total = totalCost
-        stateOrder.listOrderDetailsRequest = listCart
-        console.log(stateOrder)
+        if (!stateOrder.userId) {
+            stateOrder.userId = userId
+        }
 
-        OrderService.createOrder(stateOrder)
-            .then((response) => {
-                localStorageService.setItem('listCart', null)
-                window.setTimeout(function () {
-                    window.location.href = '/'
-                }, 1000)
-                setNotify({
-                    isOpen: true,
-                    message: 'Tạo đơn hàng thành công!',
-                    type: 'success',
+        stateOrder.total = totalCost - discount - ship
+        if (promotionId) {
+            stateOrder.promotionId = promotionId
+        }
+
+        stateOrder.listOrderDetailsRequest = listCart
+        if (localStorageService.getItem('accessToken') == null) {
+            stateOrder.userId = null
+            OrderService.createOrderGuest(stateOrder)
+                .then((response) => {
+                    localStorageService.setItem('listCart', null)
+                    window.setTimeout(function () {
+                        window.location.href = '/'
+                    }, 1000)
+                    setNotify({
+                        isOpen: true,
+                        message: 'Tạo đơn hàng thành công!',
+                        type: 'success',
+                    })
                 })
-            })
-            .catch((error) => {
-                console.log(error)
-            })
+                .catch((error) => {
+                    console.log(error)
+                    setNotify({
+                        isOpen: true,
+                        message: 'Tạo đơn hàng thất bại!',
+                        type: 'error',
+                    })
+                })
+        } else {
+            OrderService.createOrder(stateOrder)
+                .then((response) => {
+                    localStorageService.setItem('listCart', null)
+                    window.setTimeout(function () {
+                        window.location.href = '/'
+                    }, 1000)
+                    setNotify({
+                        isOpen: true,
+                        message: 'Tạo đơn hàng thành công!',
+                        type: 'success',
+                    })
+                })
+                .catch((error) => {
+                    console.log(error)
+                    setNotify({
+                        isOpen: true,
+                        message: 'Tạo đơn hàng thất bại!',
+                        type: 'error',
+                    })
+                })
+        }
         setNotify({
             ...notify,
             isOpen: false,
@@ -269,10 +610,16 @@ const AppUser = () => {
                                                                 SẢN PHẨM
                                                             </StyledTableCell>
                                                             <StyledTableCell
-                                                                align="right"
+                                                                align="center"
                                                                 width="100px"
                                                             >
                                                                 GIÁ BÁN
+                                                            </StyledTableCell>
+                                                            <StyledTableCell
+                                                                align="center"
+                                                                width="120px"
+                                                            >
+                                                                GIẢM GIÁ
                                                             </StyledTableCell>
                                                             <StyledTableCell
                                                                 align="center"
@@ -339,8 +686,13 @@ const AppUser = () => {
                                                                         </ProductDetails>
                                                                     </ProductBox>
                                                                 </StyledTableCell>
-                                                                <StyledTableCell align="right">
-                                                                    {p.price.toLocaleString(
+                                                                <StyledTableCell align="center">
+                                                                    {(
+                                                                        p.price -
+                                                                        p.price *
+                                                                            (p.discount /
+                                                                                100)
+                                                                    ).toLocaleString(
                                                                         'vi-VN',
                                                                         {
                                                                             style: 'currency',
@@ -348,6 +700,10 @@ const AppUser = () => {
                                                                                 'VND',
                                                                         }
                                                                     )}
+                                                                </StyledTableCell>
+                                                                <StyledTableCell align="center">
+                                                                    {p.discount}{' '}
+                                                                    %
                                                                 </StyledTableCell>
                                                                 <StyledTableCell align="center">
                                                                     <Box
@@ -425,7 +781,10 @@ const AppUser = () => {
                                                                 <StyledTableCell align="right">
                                                                     {(
                                                                         p.quantity *
-                                                                        p.price
+                                                                        (p.price -
+                                                                            p.price *
+                                                                                (p.discount /
+                                                                                    100))
                                                                     ).toLocaleString(
                                                                         'vi-VN',
                                                                         {
@@ -462,233 +821,11 @@ const AppUser = () => {
                                     </SimpleCard>
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <SimpleCard title="Thông tin giao hàng">
-                                        <Grid container xs={12} spacing={1.5}>
-                                            <Grid
-                                                item
-                                                xs={4}
-                                                sx={{ mt: 2, margin: 0 }}
-                                            >
-                                                <TextField
-                                                    type="text"
-                                                    onChange={handleChangeOrder}
-                                                    name="customerName"
-                                                    value={
-                                                        stateOrder.customerName
-                                                    }
-                                                    label="Họ tên"
-                                                    validators={['required']}
-                                                    errorMessages={[
-                                                        'Vui lòng nhập họ tên',
-                                                    ]}
-                                                />
-                                            </Grid>
-                                            <Grid
-                                                item
-                                                xs={4}
-                                                sx={{ mt: 2, margin: 0 }}
-                                            >
-                                                <TextField
-                                                    type="text"
-                                                    onChange={handleChangeOrder}
-                                                    name="customerPhone"
-                                                    value={
-                                                        stateOrder.customerPhone
-                                                    }
-                                                    label="Số điện thoại"
-                                                    validators={['required']}
-                                                    errorMessages={[
-                                                        'Vui lòng nhập số điện thoại',
-                                                    ]}
-                                                />
-                                            </Grid>
-                                            <Grid
-                                                item
-                                                xs={4}
-                                                sx={{ mt: 2, margin: 0 }}
-                                            >
-                                                <TextField
-                                                    type="text"
-                                                    onChange={handleChangeOrder}
-                                                    name="customerEmail"
-                                                    value={
-                                                        stateOrder.customerEmail
-                                                    }
-                                                    label="Địa chỉ email"
-                                                    validators={['required']}
-                                                    errorMessages={[
-                                                        'Vui lòng nhập email',
-                                                    ]}
-                                                />
-                                            </Grid>
-                                            <Grid
-                                                item
-                                                xs={12}
-                                                sx={{ mt: 2, margin: 0 }}
-                                                display="flex"
-                                                alignItems="center"
-                                            >
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    sx={{
-                                                        width: '120px',
-                                                        marginBottom: '16px',
-                                                    }}
-                                                    onClick={handleOpenAddress}
-                                                >
-                                                    Nhập địa chỉ
-                                                </Button>
-                                                <TextField
-                                                    sx={{
-                                                        width: '655px',
-                                                        marginLeft: '16px',
-                                                    }}
-                                                    type="text"
-                                                    name="stateAddress"
-                                                    value={stateAddress}
-                                                    label="Địa chỉ"
-                                                    disabled
-                                                />
-                                            </Grid>
-                                            <Dialog
-                                                open={openAddress}
-                                                onClose={handleCreateAddress}
-                                                sx={{
-                                                    '& .MuiDialog-container': {
-                                                        '& .MuiPaper-root': {
-                                                            width: '100%',
-                                                            maxWidth: '500px',
-                                                        },
-                                                    },
-                                                }}
-                                            >
-                                                <DialogTitle>
-                                                    Chọn địa chỉ nhận hàng
-                                                </DialogTitle>
-                                                <DialogContent>
-                                                    <Autocomplete
-                                                        disablePortal
-                                                        options={listCity}
-                                                        getOptionLabel={(
-                                                            listCity
-                                                        ) => listCity.name}
-                                                        onChange={(
-                                                            event,
-                                                            city
-                                                        ) => {
-                                                            setAddress(
-                                                                city,
-                                                                null,
-                                                                null
-                                                            )
-                                                        }}
-                                                        value={city}
-                                                        sx={{
-                                                            width: '100%',
-                                                            marginTop: '16px',
-                                                        }}
-                                                        renderInput={(
-                                                            params
-                                                        ) => (
-                                                            <TextField
-                                                                {...params}
-                                                                label="Tỉnh/Thành phố"
-                                                            />
-                                                        )}
-                                                    />
-                                                    <Autocomplete
-                                                        disablePortal
-                                                        options={listDistrict}
-                                                        getOptionLabel={(
-                                                            listDistrict
-                                                        ) => listDistrict.name}
-                                                        onChange={(
-                                                            event,
-                                                            district
-                                                        ) => {
-                                                            setAddress(
-                                                                null,
-                                                                district,
-                                                                null
-                                                            )
-                                                        }}
-                                                        value={district}
-                                                        sx={{ width: '100%' }}
-                                                        renderInput={(
-                                                            params
-                                                        ) => (
-                                                            <TextField
-                                                                {...params}
-                                                                label="Quận/Huyện"
-                                                            />
-                                                        )}
-                                                    />
-                                                    <Autocomplete
-                                                        disablePortal
-                                                        options={listWard}
-                                                        getOptionLabel={(
-                                                            listWard
-                                                        ) => listWard.name}
-                                                        onChange={(
-                                                            event,
-                                                            ward
-                                                        ) => {
-                                                            setAddress(
-                                                                null,
-                                                                null,
-                                                                ward
-                                                            )
-                                                        }}
-                                                        value={ward}
-                                                        sx={{ width: '100%' }}
-                                                        renderInput={(
-                                                            params
-                                                        ) => (
-                                                            <TextField
-                                                                {...params}
-                                                                label="Phường/Xã"
-                                                            />
-                                                        )}
-                                                    />
-                                                    <TextField
-                                                        type="text"
-                                                        value={detailAddress}
-                                                        onChange={(e) => {
-                                                            setDetailAddress(
-                                                                e.target.value
-                                                            )
-                                                        }}
-                                                        name="detailAddress"
-                                                        label="Địa chỉ"
-                                                    />
-                                                </DialogContent>
-                                                <DialogActions>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="success"
-                                                        onClick={
-                                                            handleCreateAddress
-                                                        }
-                                                    >
-                                                        Hoàn tất
-                                                    </Button>
-                                                </DialogActions>
-                                            </Dialog>
-                                            <Grid
-                                                item
-                                                xs={12}
-                                                sx={{ mt: 2, margin: 0 }}
-                                            >
-                                                <TextField
-                                                    type="text"
-                                                    onChange={handleChangeOrder}
-                                                    name="note"
-                                                    value={stateOrder.note}
-                                                    label="Ghi chú"
-                                                />
-                                            </Grid>
-                                        </Grid>
+                                    <SimpleCard title={title()}>
+                                        <label style={{ fontSize: 15 }}>
+                                            {stateAddress}
+                                        </label>
+                                        <Show />
                                     </SimpleCard>
                                 </Grid>
                             </Grid>
@@ -717,6 +854,20 @@ const AppUser = () => {
                                                 </TableRow>
                                                 <TableRow>
                                                     <TableCell align="left">
+                                                        Phí vận chuyển:
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        {ship.toLocaleString(
+                                                            'vi-VN',
+                                                            {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            }
+                                                        )}
+                                                    </TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell align="left">
                                                         Giảm giá:
                                                     </TableCell>
                                                     <TableCell align="right">
@@ -735,7 +886,9 @@ const AppUser = () => {
                                                     </TableCell>
                                                     <TableCell align="right">
                                                         {(
-                                                            totalCost - discount
+                                                            totalCost -
+                                                            discount -
+                                                            ship
                                                         ).toLocaleString(
                                                             'vi-VN',
                                                             {
@@ -777,18 +930,23 @@ const AppUser = () => {
                                                                 } else {
                                                                     if (
                                                                         totalCost *
-                                                                        (promotion.discountPercent /
-                                                                            100) > promotion.discountMax
-                                                                    ){
-                                                                        setDiscount(promotion.discountMax)
-                                                                    }
-                                                                    else{
+                                                                            (promotion.discountPercent /
+                                                                                100) >
+                                                                        promotion.discountMax
+                                                                    ) {
+                                                                        setDiscount(
+                                                                            promotion.discountMax
+                                                                        )
+                                                                    } else {
                                                                         setDiscount(
                                                                             totalCost *
                                                                                 (promotion.discountPercent /
                                                                                     100)
                                                                         )
                                                                     }
+                                                                    setPromotionId(
+                                                                        promotion.id
+                                                                    )
                                                                 }
                                                             }}
                                                             sx={{

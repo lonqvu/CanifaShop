@@ -5,18 +5,27 @@ import { Span } from 'app/components/Typography'
 import { MatxMenu } from 'app/components'
 import { ShoppingCart } from '../base'
 import { themeShadows } from 'app/components/MatxTheme/themeColors'
+import { SearchContainer, SearchInput } from 'app/views/admin/base'
+
 import {
     Icon,
     MenuItem,
     Menu,
     Button,
     Hidden,
-    Box
+    Avatar,
+    Box,
 } from '@mui/material'
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { CategoryService, AuthService, localStorageService } from 'app/services'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import {
+    CategoryService,
+    AuthService,
+    localStorageService,
+    URL_IMG,
+} from 'app/services'
 import { topBarHeight } from 'app/utils/constant'
+import FavoriteProduct from '../container/FavoriteProducts'
 
 const TopbarRoot = styled('div')(() => ({
     position: 'sticky',
@@ -90,25 +99,38 @@ const Header = () => {
     const [categoriesParent, setCategoriesParent] = useState([])
     const [auth, setAuth] = useState({})
     const navigate = useNavigate()
+    const [userId, setUserId] = useState(0)
 
     useEffect(() => {
-        CategoryService.getCategoryParent().then((response) => {
-            setCategoriesParent(response.data.data)
-        }).catch(error => {
-            console.log(error)
-        })
-        AuthService.infor().then((response) => {
-            const data = response.data.data
-            const user = { id: data.id, username: data.username }
-            setAuth(user)
-        }).catch(error => {
-            const response = error.response
-            setAuth(null)
-            if (response.status === 401 && (response.data.message === "Access is denied")) {
-                localStorageService.setItem('accessToken', null)
-                navigate('/login')
-            }
-        })
+        CategoryService.getCategoryParent()
+            .then((response) => {
+                setCategoriesParent(response.data.data)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        AuthService.infor()
+            .then((response) => {
+                const data = response.data.data
+                const user = {
+                    id: data.id,
+                    username: data.username,
+                    avatar: data.avatar,
+                }
+                setAuth(user)
+                setUserId(data.id)
+            })
+            .catch((error) => {
+                const response = error.response
+                setAuth(null)
+                if (
+                    response.status === 401 &&
+                    response.data.message === 'Access is denied'
+                ) {
+                    localStorageService.setItem('accessToken', null)
+                    navigate('/login')
+                }
+            })
     }, [])
 
     const logOut = () => {
@@ -116,13 +138,13 @@ const Header = () => {
         navigate('/login')
     }
 
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null)
     const handleCategory = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
+        setAnchorEl(event.currentTarget)
+    }
     const handleClose = () => {
-        setAnchorEl(null);
-    };
+        setAnchorEl(null)
+    }
 
     const ShowButton = () => {
         if (auth) {
@@ -130,17 +152,19 @@ const Header = () => {
                 <MatxMenu
                     menuButton={
                         <UserMenu>
-                            <AccountCircleIcon />
-                            <Hidden xsDown>
-                                <Span>
-                                    Xin chào <strong>{auth.username}</strong>
-                                </Span>
-                            </Hidden>
+                            <Avatar
+                                src={URL_IMG + auth.avatar}
+                                sx={{
+                                    width: '25px',
+                                    height: '25px',
+                                    marginLeft: '15px',
+                                }}
+                            ></Avatar>
                         </UserMenu>
                     }
                 >
                     <StyledItem>
-                        <Link to={"/profile/" + auth.username}>
+                        <Link to={'/profile/' + auth.username}>
                             <Icon> person </Icon>
                             <Span> Tài khoản của tôi </Span>
                         </Link>
@@ -153,7 +177,7 @@ const Header = () => {
             )
         } else {
             return (
-                <MenuButton onClick={() => navigate("/login")}>
+                <MenuButton onClick={() => navigate('/login')}>
                     <UserMenu>
                         <AccountCircleIcon />
                         <Hidden xsDown>
@@ -170,13 +194,18 @@ const Header = () => {
     return (
         <TopbarRoot>
             <TopbarContainer>
-                <Box display="flex" width='30%' justifyContent='flex-start' alignItems="center">
+                <Box
+                    display="flex"
+                    width="30%"
+                    justifyContent="flex-start"
+                    alignItems="center"
+                >
                     <img
-                        src='/assets/images/logos/canifa.jpg'
-                        alt='LOGO'
-                        height='40px'
+                        src="/assets/images/logos/canifa.jpg"
+                        alt="LOGO"
+                        height="40px"
                     />
-                    <ButtonCustom onClick={() => navigate("/")}>
+                    <ButtonCustom onClick={() => navigate('/')}>
                         Trang chủ
                     </ButtonCustom>
                     <ButtonCustom
@@ -197,13 +226,27 @@ const Header = () => {
                         sx={{ '& ul': { minWidth: '150px' } }}
                     >
                         {categoriesParent.map((category) => (
-                            <MenuItem key={category.seo} onClick={() => navigate("/category/" + category.seo)}>{category.name}</MenuItem>
+                            <MenuItem
+                                key={category.seo}
+                                onClick={() =>
+                                    navigate('/category/' + category.seo)
+                                }
+                            >
+                                {category.name}
+                            </MenuItem>
                         ))}
                     </Menu>
                 </Box>
-                <Box display="flex" width='30%' justifyContent='flex-end' alignItems="center">
-                    <ShoppingCart />
+                <Box
+                    display="flex"
+                    width="30%"
+                    justifyContent="flex-end"
+                    alignItems="center"
+                >
+                    
                     <ShowButton />
+                    <FavoriteProduct userId={userId} />
+                    <ShoppingCart />
                 </Box>
             </TopbarContainer>
         </TopbarRoot>

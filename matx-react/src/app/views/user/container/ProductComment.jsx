@@ -1,147 +1,3 @@
-// import React, { useState, useEffect } from 'react'
-// import { useParams, useNavigate } from 'react-router-dom'
-// import { SimpleCard } from 'app/components'
-// import { ValidatorForm } from 'react-material-ui-form-validator'
-// import { CardProduct, Container, TextField, StyledTableCell, StyledTableRow } from '../base'
-
-// import {
-//     Grid,
-//     Table,
-//     TableHead,
-//     TableBody,
-//     TableRow,
-//     TableContainer,
-//     Paper,
-//     styled,
-//     Box,
-//     Card,
-//     ToggleButton
-// } from '@mui/material'
-// import { UserService, URL_IMG } from 'app/services'
-
-// const Item = styled(Card)(({ theme }) => ({
-//     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-//     ...theme.typography.body2,
-//     padding: theme.spacing(1),
-//     textAlign: 'center',
-//     minHeight: '200px',
-//     color: '#000',
-// }));
-
-// const IMG = styled('img')(() => ({
-//     width: 75,
-// }))
-
-// const AppUser = (props) => {
-//     const code = props.code
-//     const [listProductOrders, setListProductOrders] = useState([])
-//     const [stateOrderDetai, setStateOrderDetail] = useState({})
-//     const getOrderByCode = () => {
-//         UserService.getOrderDetailsByCode(code)
-//             .then((response) => {
-//                 const d = response.data.data
-//                 setStateOrderDetail(d)
-//                 setListProductOrders(d.listProductOrders)
-//             })
-//             .catch((error) => {
-//                 console.log(error)
-//             })
-//     }
-//     useEffect(() => {
-//         getOrderByCode();
-//     }, [])
-//     return (
-//         <Container>
-//             <SimpleCard title="Đánh giá">
-//             <Box width="auto" margin="20px" overflow="auto">
-//                     {/* {Mot table} */}
-//                     <TableContainer component={Paper}>
-//                         <Table sx={{ minWidth: 700 }}>
-//                             <TableHead>
-//                                 <TableRow>
-//                                 <StyledTableCell align="center">
-//                                         Hình ảnh
-//                                     </StyledTableCell>
-//                                     <StyledTableCell align="center">
-//                                         Sản phẩm
-//                                     </StyledTableCell>
-//                                     <StyledTableCell align="center">
-//                                         Giá bán
-//                                     </StyledTableCell>
-//                                     <StyledTableCell align="center">
-//                                         Số lượng
-//                                     </StyledTableCell>
-//                                     <StyledTableCell align="center">
-//                                         Tổng tiền
-//                                     </StyledTableCell>
-//                                 </TableRow>
-//                             </TableHead>
-//                             <TableBody>
-//                                 {listProductOrders.map((order) => (
-//                                     <StyledTableRow key={order.id}>
-//                                         <StyledTableCell align="center">
-//                                             <IMG src={URL_IMG + order.avatar} />
-//                                         </StyledTableCell>
-//                                         <StyledTableCell align="center">
-//                                             {order.name}
-//                                         </StyledTableCell>
-//                                         <StyledTableCell align="center">
-//                                             {order.price.toLocaleString(
-//                                                 'vi-VN',
-//                                                 {
-//                                                     style: 'currency',
-//                                                     currency: 'VND',
-//                                                 }
-//                                             )}
-//                                         </StyledTableCell>
-//                                         <StyledTableCell align="center">
-//                                             {order.quantity}
-//                                         </StyledTableCell>
-//                                         <StyledTableCell align="center">
-//                                             {(
-//                                                 order.price * order.quantity
-//                                             ).toLocaleString('vi-VN', {
-//                                                 style: 'currency',
-//                                                 currency: 'VND',
-//                                             })}
-//                                         </StyledTableCell>
-//                                     </StyledTableRow>
-//                                 ))}
-//                             </TableBody>
-//                         </Table>
-//                     </TableContainer>
-//                 </Box>
-//                 <div>
-//                     <ValidatorForm onSubmit={()=>null} onError={() => null}>
-//                         <Grid container spacing={6}>
-//                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-//                                 <TextField
-//                                     type="text"
-//                                     name="content"
-//                                     // onChange={(e) => setName(e.target.value)}
-//                                     // value={name}
-//                                     label="Cảm nhận"
-//                                     validators={['required']}
-//                                     errorMessages={['Vui lòng nhập ý kiến đóng góp cho sản phẩm']}
-//                                 />
-//                             </Grid>
-//                         </Grid>
-//                         {/* <ButtonForm id={id} /> */}
-//                     </ValidatorForm>
-//                 </div>
-//             </SimpleCard>
-//             {/* <>
-//                 <Notify
-//                     notify={notify}
-//                     setNotify={setNotify}
-//                 >
-//                 </Notify>
-//             </> */}
-//         </Container>
-//     )
-// }
-
-// export default AppUser
 
 import React, { useState, useEffect } from 'react'
 import {
@@ -201,6 +57,7 @@ export default function Valuate(props) {
     const [selected, setSelected] = React.useState(() => [])
     const [colors, setColor] = useState('black')
     const [images, setImages] = useState([])
+    const [display, setDisplay]= useState('"flex"')
     const [notify, setNotify] = useState({
         isOpen: false,
         message: '',
@@ -237,10 +94,8 @@ export default function Valuate(props) {
                                 message: 'Đánh giá thành công, vui lòng chờ!',
                                 type: 'success',
                             })
-                            window.setTimeout(function () {
-                                setOpen(false)
-                            }, 1000)
                         })
+                        
                         .catch((error) => {
                             console.log(error)
                             setNotify({
@@ -249,6 +104,10 @@ export default function Valuate(props) {
                                 type: 'error',
                             })
                         })
+                        window.setTimeout(function () {
+                            window.location.href = '/profile/'+username
+                            setOpen(false)
+                        }, 1000)
                     
                 })
                 .catch((error) => {
@@ -270,14 +129,13 @@ export default function Valuate(props) {
                 const d = response.data.data
                 setStateOrderDetail(d)
                 setListProductOrders(d.listProductOrders)
-                // setProductId(d.listProductOrders)
-                // d.listProductOrders.map((e) => {setProductId(e.id)})
             })
             .catch((error) => {
                 console.log(error)
             })
     }
     useEffect(() => {
+        console.log(display)
         UserService.getUserByUsername(username)
             .then((response) => {
                 const user = response.data.data
@@ -311,6 +169,7 @@ export default function Valuate(props) {
                 variant="contained"
                 color="success"
                 className="butMUI-update"
+                style={{display:{display}}}
             >
                 Đánh giá
             </ButtonCustom>

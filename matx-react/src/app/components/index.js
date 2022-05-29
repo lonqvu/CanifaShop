@@ -14,6 +14,7 @@ export { default as Chatbox } from './chat-box-2/Chatbox'
 export { default as ChatAvatar } from './ChatAvatar/ChatAvatar'
 
 export { MatxLayouts } from './MatxLayout/index'
+export { MatxLayouts2 } from './MatxLayout2/index'
 export { default as MatxLayout } from './MatxLayout/MatxLayout'
 export { default as MatxTheme } from './MatxTheme/MatxTheme'
 
@@ -33,3 +34,4 @@ export { default as SimpleCard } from './cards/SimpleCard'
 export { default as MatxLogo } from './MatxLogo/MatxLogo'
 export { default as FacebookIcon } from './icons/FacebookIcon'
 export { default as GoogleIcon } from './icons/GoogleIcon'
+

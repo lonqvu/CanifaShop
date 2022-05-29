@@ -11,7 +11,7 @@ const SearchContainer = styled('div')(({ theme }) => ({
     boxShadow: '0px 0px 4px 1px #ccc',
     borderRadius: '25px',
     overflow: 'auto',
-    height: 50,
+    height: 30,
     color: 'black',
     background: 'white',
     '&::placeholder': {

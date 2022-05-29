@@ -1,10 +1,15 @@
 import http from "./http-common";
 const URL_ADMIN = "/admin/products";
 const URL_GUEST = "/guest/products"
+const URL_GUESTS = "/guest"
 class ProductService {
     //Guest
     getAllProductsHot() {
         return http.get(URL_GUEST + "/hot");
+    }
+
+    getAllProductsByCate(id) {
+        return http.get(URL_GUEST + "/cate/"+id);
     }
 
     getAllProductsBySearch(page, search, priceMin, priceMax, categoryId) {
@@ -68,6 +73,9 @@ class ProductService {
     createComment(productId, product){
         return http.post(URL_GUEST + "/" + productId+"/comment", product);
     }
+    editComment(commentId, comment){
+        return http.put(URL_GUEST + "/editComment/" + commentId, comment);
+    }
     getCommentByUser(id, page){
         return http.get(URL_GUEST+"/comment/user/"+id+"/?page="+page);
     }
@@ -77,6 +85,18 @@ class ProductService {
 
     getCheckFavorite(productId){
         return http.get(URL_GUEST+"/getCheck/"+productId)
+    }
+
+    getFavoriteProductByUserId(id){
+        return http.get(URL_GUEST+"/getProductByUserId/"+id)
+    }
+
+    getCountProduct(id){
+        return http.get(URL_GUESTS+"/countProduct/"+id)
+    }
+
+    getProductsParentBoy() {
+        return http.get(URL_GUEST + "/parentBoy");
     }
 
 }

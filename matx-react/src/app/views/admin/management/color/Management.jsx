@@ -95,7 +95,8 @@ const AppForm = () => {
                                     onChange={(e) => setName(e.target.value)}
                                     value={name}
                                     label="Tên màu sắc"
-                                    errorMessages={['this field is required']}
+                                    validators={['required']}
+                                    errorMessages={['Vui lòng nhập tên màu sắc!']}
                                 />
 
                                 <TextField
@@ -104,7 +105,8 @@ const AppForm = () => {
                                     onChange={(e) => setCode(e.target.value)}
                                     value={code}
                                     label="Mã màu sắc"
-                                    errorMessages={['this field is required']}
+                                    validators={['required']}
+                                    errorMessages={['Vui lòng chọn màu']}
                                 />
                             </Grid>
                         </Grid>

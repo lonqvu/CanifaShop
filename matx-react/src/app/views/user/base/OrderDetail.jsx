@@ -119,7 +119,7 @@ export default function OrderDetail(props) {
                                             {order.name}
                                         </StyledTableCell>
                                         <StyledTableCell align="center">
-                                            {order.price.toLocaleString(
+                                            {(order.price-(order.price*(order.discount/100))).toLocaleString(
                                                 'vi-VN',
                                                 {
                                                     style: 'currency',
@@ -132,7 +132,7 @@ export default function OrderDetail(props) {
                                         </StyledTableCell>
                                         <StyledTableCell align="center">
                                             {(
-                                                order.price * order.quantity
+                                               stateOrderDetai.total
                                             ).toLocaleString('vi-VN', {
                                                 style: 'currency',
                                                 currency: 'VND',

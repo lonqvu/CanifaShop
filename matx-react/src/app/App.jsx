@@ -5,6 +5,9 @@ import { AllPages } from './routes/routes'
 import { MatxTheme } from 'app/components'
 import { useRoutes } from 'react-router-dom'
 import { SettingsProvider } from 'app/contexts/SettingsContext'
+import "slick-carousel/slick/slick.css";
+
+import "slick-carousel/slick/slick-theme.css";
 
 const App = () => {
     const all_pages = useRoutes(AllPages())

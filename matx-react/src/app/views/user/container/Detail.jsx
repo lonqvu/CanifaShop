@@ -21,6 +21,7 @@ import {
     TableBody,
     TableRow,
     Avatar,
+    TableCell,
 } from '@mui/material'
 import {
     ProductService,
@@ -60,7 +61,7 @@ const Detail = () => {
     const [page, setPage] = useState(0)
     const [totalPages, setTotalPages] = useState()
     const [comments, setComments] = useState([])
-
+    const [count, setCount] = useState([])
     const [auth, setAuth] = useState({})
     const [id, setId] = useState(0)
 
@@ -85,6 +86,11 @@ const Detail = () => {
         message: '',
         type: '',
     })
+    const counts = (id) => {
+        ProductService.getCountProduct(id).then((res) => {
+            setCount(res.data)
+        })
+    }
 
     useEffect(() => {
         getProductBySeo(productSeo)
@@ -106,6 +112,21 @@ const Detail = () => {
                 }
             })
     }, [])
+    const checkFomatFile = (e) => {
+        if (e.includes('.mp4')) {
+            return (
+                <div>
+                    <video src={URL_IMG + e} width="55px" controls></video>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    <img src={URL_IMG + e} alt="" width="55px" />
+                </div>
+            )
+        }
+    }
 
     const checkCommentNull = (cm) => {
         if (cm.length == 0) {
@@ -159,6 +180,7 @@ const Detail = () => {
                                                     </p>
                                                 </p>
                                             </Stack>
+
                                             <Stack
                                                 direction="row"
                                                 spacing={2}
@@ -166,13 +188,30 @@ const Detail = () => {
                                             >
                                                 <p>{e.content}</p>
                                             </Stack>
-                                            <Stack direction="row" spacing={2}>
-                                                <Button type="button">
-                                                    Sửa
-                                                </Button>
-                                                <Button type="button">
-                                                    Xóa
-                                                </Button>
+                                            <Stack
+                                                direction="row"
+                                                spacing={2}
+                                                style={{
+                                                    marginLeft: 55,
+                                                }}
+                                            >
+                                                <TableContainer>
+                                                    <TableBody>
+                                                        {e.listImages.map(
+                                                            (img) => (
+                                                                <TableCell
+                                                                    style={{
+                                                                        marginRight: 5,
+                                                                    }}
+                                                                >
+                                                                    {checkFomatFile(
+                                                                        img
+                                                                    )}
+                                                                </TableCell>
+                                                            )
+                                                        )}
+                                                    </TableBody>
+                                                </TableContainer>
                                             </Stack>
                                         </Box>
                                     </TableRow>
@@ -195,7 +234,7 @@ const Detail = () => {
                 setSize(listSizes)
                 setListSizes(product.listColors[0].listSizes)
                 setId(response.data.data.id)
-
+                counts(response.data.data.id)
                 ProductService.getComment(response.data.data.id, page).then(
                     (response) => {
                         setComments(response.data.content)
@@ -272,6 +311,44 @@ const Detail = () => {
             message: 'Thêm vào giỏ hàng thành công',
             type: 'success',
         })
+    }
+
+    const discount = (x) => {
+        if (x == 0) {
+            return (
+                <p style={{
+                    fontSize: 20,
+                    fontWeight: 300,
+                    width: '100%',
+                    textAlign: 'left',
+                }}>
+                    {product.price?.toLocaleString('vi-VN', {
+                        style: 'currency',
+                        currency: 'VND',
+                    })}
+                </p>
+            )
+        } else {
+            return (
+                <div>
+                    <del style={{ fontSize: '20px', marginRight: '10px' }}>
+                        {product.price?.toLocaleString('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                        })}
+                    </del>
+                    <label style={{ fontSize: '20px', fontWeight: 600 }}>
+                        {(
+                            product.price -
+                            product.price * (x / 100)
+                        ).toLocaleString('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                        })}
+                    </label>
+                </div>
+            )
+        }
     }
     return (
         <Container>
@@ -354,15 +431,17 @@ const Detail = () => {
                                         justifyContent="start"
                                     >
                                         <p
-                                            style={{
-                                                fontSize: 25,
-                                                fontWeight: 300,
-                                                width: '100%',
-                                                textAlign: 'left',
-                                            }}
+                                            
                                         >
-                                            {product.price} đ
+                                            {discount(product.discount)}
+                                            
                                         </p>
+                                    </Stack>
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                    >
+                                        <p>Đã bán {count}</p>
                                     </Stack>
                                     <hr style={{ opacity: 0.5 }} />
                                     <Stack
@@ -467,21 +546,90 @@ const Detail = () => {
                                             THÊM VÀO GIỎ HÀNG
                                         </Button>
                                     </Stack>
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 500,
+                                            fontSize: 20,
+                                            opacity: '95%',
+                                            marginTop: '15px',
+                                        }}
+                                    >
+                                        Mô tả
+                                    </Stack>
 
                                     <Stack
                                         direction="row"
-                                        justifyContent="center"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 200,
+                                            fontSize: 15,
+                                            opacity: '80%',
+                                        }}
                                     >
-                                        <Button
-                                            variant="contained"
-                                            color="inherit"
-                                            style={{ width: '100%' }}
-                                            onClick={() =>
-                                                console.log(product.id)
-                                            }
-                                        >
-                                            Thêm vào sản phẩm yêu thích
-                                        </Button>
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: product.desciption,
+                                            }}
+                                        ></div>
+                                    </Stack>
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 500,
+                                            fontSize: 20,
+                                            opacity: '95%',
+                                            marginTop: '15px',
+                                        }}
+                                    >
+                                        Chất liệu
+                                    </Stack>
+
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 200,
+                                            fontSize: 15,
+                                            opacity: '80%',
+                                        }}
+                                    >
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: product.material,
+                                            }}
+                                        ></div>
+                                    </Stack>
+
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 500,
+                                            fontSize: 20,
+                                            opacity: '95%',
+                                            marginTop: '15px',
+                                        }}
+                                    >
+                                        Hướng dẫn sử dụng
+                                    </Stack>
+
+                                    <Stack
+                                        direction="row"
+                                        justifyContent="start"
+                                        style={{
+                                            fontWeight: 200,
+                                            fontSize: 15,
+                                            opacity: '80%',
+                                        }}
+                                    >
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: product.tutorial,
+                                            }}
+                                        ></div>
                                     </Stack>
                                 </Box>
                             </Grid>
@@ -498,31 +646,6 @@ const Detail = () => {
                 >
                     <Grid item xs={12}>
                         <SimpleCard height="auto" title="Bình luận">
-                            <Stack direction="row" justifyContent="start">
-                                {/* <ValidatorForm>
-                                    <TextField
-                                        sx={{
-                                            width: '455px',
-                                            float: 'left',
-                                        }}
-                                        type="text"
-                                        name="stateAddress"
-                                        // value={stateAddress}
-                                        label="Nhập bình luận"
-                                    />
-                                </ValidatorForm>
-                                <Button
-                                    color="success"
-                                    variant="contained"
-                                    type="submit"
-                                    style={{
-                                        height: 50,
-                                        marginLeft: 10,
-                                    }}
-                                >
-                                    Gửi
-                                </Button> */}
-                            </Stack>
                             {checkCommentNull(comments)}
                             <Stack spacing={2} paddingTop={3} paddingBottom={1}>
                                 <Box

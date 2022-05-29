@@ -189,10 +189,11 @@ const List = () => {
                                 <TableRow>
                                     <StyledTableCell align="center" width="50px">STT</StyledTableCell>
                                     <StyledTableCell align="center">Tên tài khoản</StyledTableCell>
+                                    <StyledTableCell align="center">Ngày tạo</StyledTableCell>
                                     <StyledTableCell align="center">Họ Tên</StyledTableCell>
                                     <StyledTableCell align="center">Số Điện Thoại</StyledTableCell>
                                     <StyledTableCell align="center">Email</StyledTableCell>
-                                    <StyledTableCell align="center" width="175px">Hành động</StyledTableCell>
+                                    <StyledTableCell align="center" width="205px">Hành động</StyledTableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -200,11 +201,22 @@ const List = () => {
                                     <StyledTableRow key={user.id}>
                                         <StyledTableCell align="center">{++index + ((page) * size)}</StyledTableCell>
                                         <StyledTableCell align="center">{user.username}</StyledTableCell>
+                                        <StyledTableCell align="center">{user.createdAt}</StyledTableCell>
                                         <StyledTableCell align="center">{user.firstName + " " + user.lastName}</StyledTableCell>
                                         <StyledTableCell align="center">{user.phone}</StyledTableCell>
                                         <StyledTableCell align="center">{user.email}</StyledTableCell>
                                         <StyledTableCell align="center">
+                                        <Fab
+                                                size="small"
+                                                color="secondary"
+                                                aria-label="Edit"
+                                                className="button"
+                                                onClick={() => navigate("/admin/user/update/" + user.id)}
+                                            >
+                                                <Icon>edit</Icon>
+                                            </Fab>
                                             <ShowButton user={user}/>
+                                            
                                             <Fab
                                                 size="small"
                                                 color="secondary"

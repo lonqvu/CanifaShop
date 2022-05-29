@@ -36,6 +36,7 @@ const AppForm = () => {
         OrderService.getOrderByIdAdmin(id).then((response) => {
             setOrders(response.data.data)
             setListOrders(response.data.data.listProductOrders);
+            console.log(response.data.data.listProductOrders)
         }).catch(error => {
             console.log(error);
         })
@@ -91,15 +92,6 @@ const AppForm = () => {
                     </h2>
                     <h3 style={{ color: "#88cad8" }}>{orders.orderStatus}
 
-                        <Fab
-                            size="small"
-                            aria-label="mode_edit"
-                            className="but"
-                            onClick={onClickk}
-                        >
-                            <Icon>mode_edit</Icon>
-                            {isShow ? <Text /> : null}
-                        </Fab>
                     </h3>
                     <hr></hr>
                     <div className='Order-detail-view'>
@@ -141,7 +133,7 @@ const AppForm = () => {
                                             <StyledTableCell align="center">{order.size}</StyledTableCell>
                                             <StyledTableCell align="center">{order.color}</StyledTableCell>
                                             <StyledTableCell align="center">{order.quantity}</StyledTableCell>
-                                            <StyledTableCell align="center">{order.price*order.quantity}</StyledTableCell>
+                                            <StyledTableCell align="center">{(order.price*order.quantity-((order.price*order.quantity)*(order.discount/100))).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</StyledTableCell>
                                             
                                         </StyledTableRow>
                                     ))}

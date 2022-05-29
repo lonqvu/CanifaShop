@@ -28,6 +28,7 @@ import FavoriteBorder from '@mui/icons-material/FavoriteBorder'
 import Favorite from '@mui/icons-material/Favorite'
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
+import EditEvaluate from './EditComment'
 import {
     UserService,
     URL_IMG,
@@ -124,16 +125,14 @@ export default function MyValuate(props) {
     const handleSelected = (event, newSelected) => {
         if (newSelected.length) {
             setSelected(newSelected)
-            console.log(newSelected)
         }
     }
 
     const checkFavorite = (ex) => {
         ProductService.getCheckFavorite(ex).then((res) => {
             console.log(res.data.data)
-                // return res.data.data
+            // return res.data.data
             // setC
-
         })
     }
 
@@ -265,20 +264,12 @@ export default function MyValuate(props) {
                                             spacing={2}
                                             style={{
                                                 marginLeft: 55,
+                                                marginTop: 20,
                                             }}
                                         >
-                                            <Checkbox
-                                                icon={<FavoriteBorder />}
-                                                checkedIcon={<Favorite />}
-                                                // checked={()=>{
-                                                //     ProductService.getCheckFavorite(ex).then((res) => {
-                                                        
-                                                //     })
-                                                // }}
-                                            />
-                                            <Button type="button">
-                                                <EditIcon />
-                                            </Button>
+                                            <EditEvaluate
+                                                id={e.id}
+                                            ></EditEvaluate>
                                         </Stack>
                                     </Box>
                                 </TableRow>

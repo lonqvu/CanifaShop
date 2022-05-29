@@ -23,5 +23,11 @@ class PromotionService{
     getPromotionAdminById(id){
         return http.get(URL_ADMIN + "/"+id);
     }
+
+    createAvatar(id, avatar) {
+        let formData = new FormData();
+        formData.append("avatar", avatar)
+        return http.post(URL_ADMIN + '/' + 'uploadfile' + '/' + id, formData)
+    }
 }
 export default new PromotionService();

@@ -16,11 +16,14 @@ import {
     Table,
     TableHead,
     TableBody,
+    Fab,
+    Icon,
     TableRow,
     TableContainer,
     Paper,
     Tab,
     Autocomplete,
+    Stack,
     Tabs,
     Typography,
     Button,
@@ -32,14 +35,16 @@ import {
     FormControlLabel,
     RadioGroup,
     FormControl,
+    Avatar,
     FormLabel,
     MenuItem,
 } from '@mui/material'
 import { OrderDetail } from 'app/views/user/base'
 import Valuate from './ProductComment'
-import { UserAddressService } from 'app/services'
+import { UserAddressService, URL_IMG } from 'app/services'
 import { Notify, AlertDialog, showError } from 'app/views/action'
 import MyValuate from './MyEvaluate'
+import { setCanvasCreator } from 'echarts'
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props
@@ -99,22 +104,16 @@ export default function VerticalTabs() {
     }
 
     const navigate = useNavigate()
-    const [listCity, setListCity] = useState(dataVietNam.city)
-    const [listDistrict, setListDistrict] = useState(dataVietNam.district[0])
-    const [listWard, setListWard] = useState([])
-    const [city, setCity] = useState()
-    const [district, setDistrict] = useState()
-    const [ward, setWard] = useState()
-
     const { username } = useParams()
     const [statePassword, setStatePassword] = useState({})
     const [stateInfor, setStateInfor] = useState({})
     const [stateOrder, setStateOrder] = useState([])
     const [stateStatus, setStateStatus] = useState(4)
-    const [detailAddress, setDetailAddress] = useState()
     const [listAddress, setListAddress] = useState([])
     const [orderStatus, setStatus] = useState(0)
     const [id, setId] = useState('')
+    const [avatar, setAvatar] = useState('')
+    const [userId, setUserId] = useState(0)
     const [confirmDialog, setConfirmDialog] = useState({
         isOpen: false,
         title: '',
@@ -125,10 +124,24 @@ export default function VerticalTabs() {
     const updateUser = (e) => {
         UserService.updateUser(username, stateInfor)
             .then((response) => {
-                navigate('/admin/user-profile')
+                createAvatar()
+                // navigate('/profile/' + username)
+                window.setTimeout(function () {
+                    window.location.href = '/profile/'+username
+                }, 500)
+                setNotify({
+                    isOpen: true,
+                    message: 'Cập nhật thành công!',
+                    type: 'success',
+                })
             })
             .catch((error) => {
                 console.log(error)
+                setNotify({
+                    isOpen: true,
+                    message: 'Cập nhật thất bại!',
+                    type: 'success',
+                })
             })
     }
 
@@ -138,16 +151,21 @@ export default function VerticalTabs() {
             [name]: value,
         })
     }
+    const createAvatar = () => {
+        UserService.uploadAvatar(userId, avatar).then((response) => {
+            
+        })
+    }
 
     useEffect(() => {
-        UserAddressService.getAddressByUsername(username).then((response)=>{
+        UserAddressService.getAddressByUsername(username).then((response) => {
             setListAddress(response.data.data)
-            // setAddress()
         })
         UserService.getUserByUsername(username)
             .then((response) => {
                 const user = response.data.data
-
+                setUserId(user.id)
+                setAvatar(user.avatar)
                 setStateInfor({
                     firstName: user.firstName,
                     lastName: user.lastName,
@@ -170,37 +188,37 @@ export default function VerticalTabs() {
 
     ///////////////////////////////////////////  địa chỉ
 
-    const setNameAddress = (id)=>{
-        
-    }
-
-    const setAddress = (city, district, ward) => {
-        if (city) {
-            setListDistrict(
-                dataVietNam.district.filter((d) => d.idCity === city)
-            )
-            setCity(city)
-           console.log(city.name)
-        }
-
-        if (district) {
-            setListWard(
-                dataVietNam.ward.filter(
-                    (w) => w.idDistrict === district.idDistrict
+    const deleteAddress = (id) => {
+        UserAddressService.deleteAddress(id)
+            .then((res) => {
+                UserAddressService.getAddressByUsername(username).then(
+                    (response) => {
+                        setListAddress(response.data.data)
+                    }
                 )
-            )
-            setDistrict(district)
-        }
+                setNotify({
+                    isOpen: true,
+                    message: 'Xóa thành công!',
+                    type: 'success',
+                })
+            })
+            .catch((error) => {
+                console.log(error)
+                setNotify({
+                    isOpen: true,
+                    message: 'Xóa thất bại!',
+                    type: 'error',
+                })
+            })
 
-        if (ward) {
-            setWard(ward)
-        }
+        setNotify({
+            isOpen: false,
+        })
     }
 
     ///////////////////////////////////////////  đổi mật khẩu
 
     useEffect(() => {
-        
         ValidatorForm.addValidationRule('isPasswordMatch', (value) => {
             console.log(value)
 
@@ -222,10 +240,21 @@ export default function VerticalTabs() {
     const updatePassword = (e) => {
         UserService.updatePassword(username, statePassword)
             .then((response) => {
-                navigate('/admin/user-profile')
+                window.setTimeout(function () {
+                    window.location.href = '/profile/'+username
+                }, 500)
+                setNotify({
+                    isOpen: true,
+                    message: 'Thay đổi mật khẩu thành công!',
+                    type: 'success',
+                })
             })
             .catch((error) => {
-                console.log(error)
+                setNotify({
+                    isOpen: true,
+                    message: 'Thay đổi mật khẩu thất bại!',
+                    type: 'error',
+                })
             })
     }
 
@@ -264,7 +293,6 @@ export default function VerticalTabs() {
                         >
                             Hoàn thành
                         </ButtonCustom>
-                        
                     </ValidatorForm>
                 </div>
             )
@@ -290,7 +318,7 @@ export default function VerticalTabs() {
         } else if (e.orderStatus !== 'Đã hủy') {
             return (
                 <div>
-                    <Valuate code={e.code}></Valuate>
+                    <Valuate code={e.code} ></Valuate>
                 </div>
             )
         } else {
@@ -378,6 +406,42 @@ export default function VerticalTabs() {
                                 >
                                     <Grid container spacing={6}>
                                         <Grid item xs={12} sx={{ mt: 2 }}>
+                                            <Stack
+                                                direction="row"
+                                                sx={{ marginBottom: 2 }}
+                                            >
+                                                <Avatar
+                                                    alt="Remy Sharp"
+                                                    src={URL_IMG + avatar}
+                                                    sx={{
+                                                        width: '75px',
+                                                        height: '75px',
+                                                    }}
+                                                ></Avatar>
+                                                <Fab
+                                                    size="small"
+                                                    sx={{ marginTop: 2, marginLeft:1}}
+                                                    color="primary"
+                                                    aria-label="Add"
+                                                >
+                                                    <input
+                                                        style={{
+                                                            opacity: '0%',
+                                                            with: '100px',
+                                                            position:
+                                                                'absolute',
+                                                        }}
+                                                        type="file"
+                                                        onChange={(e) => {
+                                                            setAvatar(
+                                                                e.target
+                                                                    .files[0]
+                                                            )
+                                                        }}
+                                                    ></input>
+                                                    <Icon>add</Icon>
+                                                </Fab>
+                                            </Stack>
                                             <TextField
                                                 type="text"
                                                 name="username"
@@ -458,7 +522,7 @@ export default function VerticalTabs() {
                         <TabPanel value={value} index={1}>
                             <SimpleCard title="Địa chỉ của tôi">
                                 <ValidatorForm
-                                    onSubmit={updatePassword}
+                                    onSubmit={() => null}
                                     onError={() => null}
                                 >
                                     <Grid container spacing={6}>
@@ -493,23 +557,46 @@ export default function VerticalTabs() {
                                                                         STT
                                                                     </StyledTableCell>
                                                                     <StyledTableCell align="center">
-                                                                        Tỉnh/Thành phố
+                                                                        Tỉnh/Thành
+                                                                        phố
                                                                     </StyledTableCell>
                                                                     <StyledTableCell align="center">
-                                                                        Quận/ Huyện
+                                                                        Quận/
+                                                                        Huyện
                                                                     </StyledTableCell>
                                                                     <StyledTableCell
                                                                         align="center"
                                                                         width="175px"
                                                                     >
-                                                                       Xã/Phường
+                                                                        Xã/Phường
+                                                                    </StyledTableCell>
+                                                                    <StyledTableCell
+                                                                        align="center"
+                                                                        width="175px"
+                                                                    >
+                                                                        Địa chỉ
+                                                                    </StyledTableCell>
+                                                                    <StyledTableCell
+                                                                        align="center"
+                                                                        width="175px"
+                                                                    >
+                                                                        Số điện
+                                                                        thoại
+                                                                    </StyledTableCell>
+                                                                    <StyledTableCell
+                                                                        align="center"
+                                                                        width="175px"
+                                                                    >
+                                                                        Hành
+                                                                        động
                                                                     </StyledTableCell>
                                                                 </TableRow>
                                                             </TableHead>
                                                             <TableBody>
                                                                 {listAddress.map(
                                                                     (
-                                                                        address, index
+                                                                        address,
+                                                                        index
                                                                     ) => (
                                                                         <StyledTableRow
                                                                             key={
@@ -517,17 +604,34 @@ export default function VerticalTabs() {
                                                                             }
                                                                         >
                                                                             <StyledTableCell align="center">
-                                                                                {index++}
+                                                                                {
+                                                                                    index++
+                                                                                }
                                                                             </StyledTableCell>
                                                                             <StyledTableCell align="center">
                                                                                 {
-                                                                                    setAddress()
+                                                                                    address.city
                                                                                 }
                                                                             </StyledTableCell>
-                                                                            {/* <StyledTableCell align="center">
-                                                                                {displayParent(
-                                                                                    category.parent
-                                                                                )}
+                                                                            <StyledTableCell align="center">
+                                                                                {
+                                                                                    address.district
+                                                                                }
+                                                                            </StyledTableCell>
+                                                                            <StyledTableCell align="center">
+                                                                                {
+                                                                                    address.ward
+                                                                                }
+                                                                            </StyledTableCell>
+                                                                            <StyledTableCell align="center">
+                                                                                {
+                                                                                    address.detail
+                                                                                }
+                                                                            </StyledTableCell>
+                                                                            <StyledTableCell align="center">
+                                                                                {
+                                                                                    address.phone
+                                                                                }
                                                                             </StyledTableCell>
                                                                             <StyledTableCell align="center">
                                                                                 <Fab
@@ -537,8 +641,8 @@ export default function VerticalTabs() {
                                                                                     className="button"
                                                                                     onClick={() =>
                                                                                         navigate(
-                                                                                            '/admin/category/management/' +
-                                                                                                category.id
+                                                                                            '/user/UpdateAddress/' +
+                                                                                                address.id
                                                                                         )
                                                                                     }
                                                                                 >
@@ -560,8 +664,13 @@ export default function VerticalTabs() {
                                                                                                     'Bạn sẽ không thể hoàn tác lại thao tác này!',
                                                                                                 onConfirm:
                                                                                                     () => {
-                                                                                                        deleteCategory(
-                                                                                                            category.id
+                                                                                                        deleteAddress(
+                                                                                                            address.id
+                                                                                                        )
+                                                                                                        setConfirmDialog(
+                                                                                                            {
+                                                                                                                isOpen: false,
+                                                                                                            }
                                                                                                         )
                                                                                                     },
                                                                                             }
@@ -572,38 +681,13 @@ export default function VerticalTabs() {
                                                                                         delete
                                                                                     </Icon>
                                                                                 </Fab>
-                                                                            </StyledTableCell> */}
+                                                                            </StyledTableCell>
                                                                         </StyledTableRow>
                                                                     )
                                                                 )}
                                                             </TableBody>
                                                         </Table>
                                                     </TableContainer>
-                                                    {/* <Stack
-                                                        spacing={2}
-                                                        paddingTop={3}
-                                                        paddingBottom={1}
-                                                    >
-                                                        <Box
-                                                            my={2}
-                                                            display="flex"
-                                                            justifyContent="center"
-                                                        >
-                                                            <Pagination
-                                                                count={
-                                                                    totalPages
-                                                                }
-                                                                page={page + 1}
-                                                                onChange={
-                                                                    handleChangePage
-                                                                }
-                                                                variant="outlined"
-                                                                color="primary"
-                                                                showFirstButton
-                                                                showLastButton
-                                                            />
-                                                        </Box>
-                                                    </Stack> */}
                                                 </Box>
                                             </SimpleCard>
                                         </Grid>
@@ -612,8 +696,13 @@ export default function VerticalTabs() {
                                         color="success"
                                         variant="contained"
                                         size="large"
-                                        type="submit"
-                                        startIcon={'Xác nhận'}
+                                        type="button"
+                                        onClick={() =>
+                                            navigate(
+                                                '/user/AddAddress/' + username
+                                            )
+                                        }
+                                        startIcon={'Thêm địa chỉ'}
                                         style={{ width: '100%' }}
                                     ></Button>
                                 </ValidatorForm>
@@ -649,7 +738,7 @@ export default function VerticalTabs() {
                                                 }
                                                 validators={['required']}
                                                 errorMessages={[
-                                                    'this field is required',
+                                                    'Mật khẩu cũ không được để trống',
                                                 ]}
                                             />
                                             <TextValidator
@@ -668,7 +757,7 @@ export default function VerticalTabs() {
                                                 }
                                                 validators={['required']}
                                                 errorMessages={[
-                                                    'this field is required',
+                                                    'Mật khẩu mới không được để trống',
                                                 ]}
                                             />
                                             <TextValidator
@@ -690,8 +779,8 @@ export default function VerticalTabs() {
                                                     'isPasswordMatch',
                                                 ]}
                                                 errorMessages={[
-                                                    'this field is required',
-                                                    "password didn't match",
+                                                    'Không được để trống',
+                                                    'Mật khẩu mới không khớp',
                                                 ]}
                                             />
                                         </Grid>
