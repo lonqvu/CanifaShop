@@ -17,7 +17,9 @@ public class ProductOrderMapper {
 				.name(entity.getProductDetailEntity().getProductEntity().getName())
 				.size(entity.getProductDetailEntity().getSizeEntity().getName())
 				.color(entity.getProductDetailEntity().getColorEntity().getName()).quantity(entity.getQuantity())
-				.price(entity.getProductDetailEntity().getProductEntity().getPrice()).build();
+				.price(entity.getProductDetailEntity().getProductEntity().getPrice())
+				.discount(entity.getProductDetailEntity().getProductEntity().getDiscount())
+				.build();
 	}
 
 }

@@ -19,6 +19,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class PromotionResponse extends BaseResponse{
 
+	private String avatar;
+
 	private String name;
 	
 	private Date startDate;

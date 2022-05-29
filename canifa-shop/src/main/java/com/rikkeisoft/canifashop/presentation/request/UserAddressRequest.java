@@ -13,11 +13,11 @@ import lombok.Setter;
 @Builder
 public class UserAddressRequest {
 	
-	private int city;
+	private String city;
 
-	private int district;
+	private String district;
 
-	private int ward;
+	private String ward;
 
 	private String detail;
 
@@ -25,5 +25,5 @@ public class UserAddressRequest {
 
 	private boolean isDefault;
 	
-	private Long userId;
+	private String userName;
 }

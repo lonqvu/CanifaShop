@@ -1,15 +1,8 @@
 package com.rikkeisoft.canifashop.presentation.controller.user;
 
+import com.rikkeisoft.canifashop.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.rikkeisoft.canifashop.base.BaseController;
 import com.rikkeisoft.canifashop.base.BaseResponseEntity;
@@ -25,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class UserAddressController extends BaseController{
 
 	public final UserAddressService addressService;
+	private final UserRepository userRepository;
 
 	@GetMapping("/list/{username}")
 	public ResponseEntity<BaseResponseEntity> getAddressByUsername(@PathVariable("username") String username) {
@@ -51,6 +45,10 @@ public class UserAddressController extends BaseController{
 	public ResponseEntity<BaseResponseEntity> deleteById(@PathVariable("id") Long id) {
 		addressService.deleteById(id);
 		return success("Delete user address successful");
+	}
+	@GetMapping("/getByUserName")
+	public Long getIdByUserName (@RequestParam("name") String name){
+		return userRepository.getIdByUsername(name);
 	}
 	
 }

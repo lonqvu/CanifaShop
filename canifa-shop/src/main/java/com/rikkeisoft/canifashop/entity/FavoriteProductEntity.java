@@ -21,4 +21,6 @@ public class FavoriteProductEntity extends BaseEntity {
     private ProductEntity productEntity;
 
 
+
+
 }

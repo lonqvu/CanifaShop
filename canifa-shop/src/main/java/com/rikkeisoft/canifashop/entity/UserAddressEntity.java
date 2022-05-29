@@ -13,11 +13,11 @@ import javax.persistence.*;
 @Table(name = "tbl_user_address")
 public class UserAddressEntity extends BaseEntity {
     @Column(name = "city", nullable = false)
-    private int city;
+    private String city;
     @Column(name = "district", nullable = false)
-    private int district;
+    private String district;
     @Column(name = "ward", nullable = false)
-    private int ward;
+    private String ward;
     @Column(name = "detail", length = 45, nullable = false)
     private String detail;
     @Column(name = "phone", length = 10, nullable = false)

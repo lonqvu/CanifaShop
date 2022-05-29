@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -47,7 +48,11 @@ public interface CategoryService {
 
 	List<CategoryResponse> getCategoryParent();
 
+	List<CategoryResponse> getCategoryParentWomen();
+
 	List<CategoryResponse> getCategorySub(String seo);
+
+
 }
 
 @Service
@@ -66,7 +71,7 @@ class CategoryServiceImpl implements CategoryService {
 	@Override
 	public BasePagerData<CategoryResponse> getCategoryByPaging(Integer page, Integer size, String keyword) {
 
-		Pageable paging = PageRequest.of(page, size);
+		Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
 
 		if (keyword.equals("-1") || keyword.isEmpty()) {
 			keyword = null;
@@ -162,6 +167,13 @@ class CategoryServiceImpl implements CategoryService {
 		return categoryRepository.getAllCategoriesParent().stream().map(e -> CategoryMapper.convertToResponse(e))
 				.collect(Collectors.toList());
 	}
+
+	@Override
+	public List<CategoryResponse> getCategoryParentWomen() {
+		return categoryRepository.getAllCategoriesParentWomen().stream().map(e -> CategoryMapper.convertToResponse(e))
+				.collect(Collectors.toList());
+	}
+
 
 	@Override
 	public List<CategoryResponse> getCategorySub(String seo) {

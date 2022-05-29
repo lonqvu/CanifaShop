@@ -19,6 +19,7 @@ public class CategoryMapper {
 					.parent(null).build();
 		} else {
 			return CategoryResponse.builder().id(entity.getId()).name(entity.getName()).seo(entity.getSeo())
+					.avatar(entity.getAvatar())
 					.parent(convertToResponse(entity.getParent())).build();
 		}
 	}
@@ -27,6 +28,7 @@ public class CategoryMapper {
 	public static CategoryEntity convertToEntity(CategoryRequest request) {
 		return CategoryEntity.builder()
 				.name(request.getName())
+				.avatar(request.getAvatar())
 				.build();
 	}
 

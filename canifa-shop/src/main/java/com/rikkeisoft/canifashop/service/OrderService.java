@@ -82,6 +82,7 @@ class OrderServiceImpl implements OrderService {
 	private final ProductDetailRepository productDetailRepository;;
 	private final ProductService productService;
 
+
 	@Override
 	public BasePagerData<OrderResponse> getOrdersByPaging(Integer page, Integer size, String keyword) {
 
@@ -127,11 +128,11 @@ class OrderServiceImpl implements OrderService {
 		if (userEntity != null) {
 			orderEntity.setUserEntity(userEntity);
 		}
+
 		if (promotionEntity != null) {
 			orderEntity.setPromotionEntity(promotionEntity);
 		}
 		orderEntity.setOrderDetailEntities(new HashSet<>());
-
 		orderRequest.getListOrderDetailsRequest().forEach(id -> {
 			ProductDetailEntity productDetailEntity = productDetailRepository.findByListId(id.getColorId(),
 					id.getProductId(), id.getSizeId());

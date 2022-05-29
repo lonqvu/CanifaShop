@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
+import com.rikkeisoft.canifashop.entity.ProductEntity;
 import com.rikkeisoft.canifashop.presentation.response.RevenueByResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import com.rikkeisoft.canifashop.entity.OrderEntity;
 import com.rikkeisoft.canifashop.presentation.response.statisticalReponse;
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
+	OrderEntity findByIdAndDeletedFlagFalse(Long id);
 	@Query(value = "SELECT * " +
 			"FROM tbl_orders " +
 			"where month(updated_at) = :month " +
@@ -56,7 +58,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
 	@Query(value = "SELECT * FROM tbl_orders WHERE deleted_flag IS FALSE "
 			+ "AND user_id IN (SELECT id FROM tbl_users WHERE username = :username) "
-			+ "AND (:status IS NULL OR (order_status = :status)) ", nativeQuery = true)
+			+ "AND (:status IS NULL OR (order_status = :status)) ORDER BY created_at DESC", nativeQuery = true)
 	List<OrderEntity> filterOrderByStatus(@Param("username") String username, @Param("status") String status);
 
 	@Query(value = "SELECT p.name as name, count(pd.id) as quantity,count(pd.id)*(p.price/100*(100-p.discount)) as total"
@@ -159,4 +161,14 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 			"   group by u.username, u.id  " +
 			"   order by count(o.user_id) desc;", nativeQuery = true)
 	List<RevenueByResponse> RevenueByQuantityOrderCancel(LocalDateTime startDate, LocalDateTime endDate);
+	@Query(value = "SELECT count(p.id) as quantity" +
+			" from tbl_orders as o  " +
+			" join tbl_order_details as od on o.id = od.order_id   " +
+			"  join tbl_product_detail as pd on od.product_detail_id = pd.id  " +
+			"  join tbl_products as p on pd.product_id = p.id   " +
+			"  WHERE o.deleted_flag IS FALSE   " +
+			"  AND order_status = 'COMPLETED'   " +
+			"  And p.id = :id" +
+			"  group by p.name  ", nativeQuery = true)
+	Integer countProduct(Long id);
 }

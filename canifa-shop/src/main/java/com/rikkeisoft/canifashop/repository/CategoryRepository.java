@@ -35,4 +35,14 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
   @Query(value = "SELECT * FROM tbl_categories WHERE parent_id IS NULL", nativeQuery = true)
 	List<CategoryEntity> getAllCategoriesParent();
 
+	@Query(value = "SELECT * FROM tbl_categories WHERE parent_id =2", nativeQuery = true)
+	List<CategoryEntity> getAllCategoriesParentWomen();
+
+	@Query(value = "SELECT *" +
+			"  from tbl_products as p   " +
+			"  join tbl_categories as c on p.category_id = c.id  " +
+			"  WHERE p.deleted_flag IS FALSE    " +
+			"AND c.parent_id = 9", nativeQuery = true)
+	List<CategoryEntity> getAllCategoriesParentBoy();
+
 }

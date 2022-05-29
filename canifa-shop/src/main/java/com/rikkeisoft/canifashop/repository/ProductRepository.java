@@ -1,5 +1,6 @@
 package com.rikkeisoft.canifashop.repository;
 
+import com.rikkeisoft.canifashop.entity.CategoryEntity;
 import com.rikkeisoft.canifashop.entity.ProductEntity;
 
 import java.math.BigDecimal;
@@ -41,10 +42,20 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 	@Query(value = "SELECT * FROM tbl_products WHERE deleted_flag IS FALSE AND is_hot = b'1'", nativeQuery = true)
 	List<ProductEntity> findByHot();
 
+	@Query(value = "SELECT * FROM tbl_products WHERE deleted_flag IS FALSE AND category_id = :cate", nativeQuery = true)
+	List<ProductEntity> findByCate(Long cate);
+
   @Query(value = "SELECT COUNT(id) FROM tbl_products WHERE deleted_flag IS FALSE", nativeQuery = true)
 	int countProducts();
 
 	@Query(value = "SELECT * FROM tbl_products WHERE deleted_flag = b'0' "
 			+ "AND (:checkCategory IS NULL or (category_id IN (:listCategoryId))) ", nativeQuery = true)
 	Page<ProductEntity> searchByCategories(String checkCategory, Set<Long> listCategoryId, Pageable paging);
+	@Query(value = "SELECT p.*" +
+			"  from tbl_products as p   " +
+			"  join tbl_categories as c on p.category_id = c.id  " +
+			"  WHERE p.deleted_flag IS FALSE    " +
+			"AND c.parent_id = 9", nativeQuery = true)
+	List<ProductEntity> getAllProductParentBoy();
+
 }

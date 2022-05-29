@@ -15,11 +15,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class UserAddressResponse extends BaseResponse {
 
-	private int city;
+	private String city;
 
-	private int district;
+	private String district;
 
-	private int ward;
+	private String ward;
 
 	private String detail;
 

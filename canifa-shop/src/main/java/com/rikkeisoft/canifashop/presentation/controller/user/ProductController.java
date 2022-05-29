@@ -7,10 +7,8 @@ import com.rikkeisoft.canifashop.presentation.request.FavoriteProductRequest;
 import com.rikkeisoft.canifashop.presentation.request.ProductCommentRequest;
 import com.rikkeisoft.canifashop.presentation.response.ProductCommentResponse;
 import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
-import com.rikkeisoft.canifashop.service.FavoriteProductService;
-import com.rikkeisoft.canifashop.service.FileImageService;
-import com.rikkeisoft.canifashop.service.ProductCommentService;
-import com.rikkeisoft.canifashop.service.ProductService;
+import com.rikkeisoft.canifashop.repository.OrderRepository;
+import com.rikkeisoft.canifashop.service.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +36,7 @@ public class ProductController extends BaseController {
 	private final FileImageService fileImageService;
 	private final ProductCommentService productCommentService;
 	private final FavoriteProductService favoriteProductService;
+	private final OrderRepository orderRepository;
 
 	@GetMapping("/products/search")
 	public ResponseEntity<BasePagerData<ProductResponse>> getProductsByKeyword(
@@ -53,6 +53,12 @@ public class ProductController extends BaseController {
 	public ResponseEntity<BaseResponseEntity> getProductsByHot() {
 		return success(productService.getByHot(), "Get list products hot successful");
 	}
+
+	@GetMapping("/products/cate/{id}")
+	public ResponseEntity<BaseResponseEntity> getProductsByHot(@PathVariable("id") Long id) {
+		return success(productService.getByCate(id), "Get list products by cate successful");
+	}
+
 
 	@GetMapping("/products/detail/{seo}")
 	public ResponseEntity<BaseResponseEntity> getProductBySeo(@PathVariable("seo") String seo) {
@@ -106,23 +112,44 @@ public class ProductController extends BaseController {
 
 		return created(fileImageService.storeFileComment(id, images), "Create images of comment product successful");
 	}
+	@PutMapping("/products/editComment/{id}")
+	ResponseEntity<BaseResponseEntity> updateCommentProduct(@RequestBody ProductCommentRequest productCommentRequest,
+															@PathVariable("id") Long id) {
+		return success(productCommentService.editComment(productCommentRequest, id), "edit comment products successful");
+	}
 	// add list favorite
 	@PostMapping("/products/{id}")
 	ResponseEntity<BaseResponseEntity> addFavoriteProduct(@RequestBody FavoriteProductRequest favoriteProductRequest,
 													 @PathVariable("id") Long id){
 		return success(favoriteProductService.addListFavoriteProduct(favoriteProductRequest, id), "Add favorite products successful");
-}
+	}
+
 	// get list favorite
 	@GetMapping("/products/getall")
 	ResponseEntity<BaseResponseEntity> getAllFavorite(){
 
 		return success(favoriteProductService.getListFavoriteProduct(), "get list favorite product successful");
 	}
+	@GetMapping("/products/getProductByUserId/{id}")
+	ResponseEntity<BaseResponseEntity> getAllFavoriteByUserId(@PathVariable("id") Long id){
+
+		return success(favoriteProductService.getFavoriteByUserId(id), "get favorite product by user successful");
+	}
 
 	@GetMapping("/products/getCheck/{id}")
 	ResponseEntity<BaseResponseEntity> getCheck(@PathVariable("id") Long id){
 
 		return success(favoriteProductService.checkFavorite(id), "get list favorite product successful");
+	}
+
+	@GetMapping("/countProduct/{id}")
+	public ResponseEntity<?> getCountOrders(@PathVariable("id") Long id){
+		return ResponseEntity.ok(orderRepository.countProduct(id));
+	}
+
+	@GetMapping("/products/parentBoy")
+	public ResponseEntity<BaseResponseEntity> getCategoryParentBoy() {
+		return success(productService.getProductParentBoy(), "Get categories parent boy successful");
 	}
 
 

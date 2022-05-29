@@ -29,6 +29,6 @@ public class ProductOrderResponse extends BaseResponse{
 
 	private BigDecimal price;
 
-	private BigDecimal priceSale;
+	private Integer discount;
 
 }

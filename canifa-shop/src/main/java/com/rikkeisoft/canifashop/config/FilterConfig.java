@@ -45,7 +45,7 @@ public class FilterConfig extends OncePerRequestFilter {
 			response.setContentType(APPLICATION_JSON_VALUE);
 			response.setStatus(UNAUTHORIZED.value());
 			String authorizationHeader = request.getHeader(AUTHORIZATION);
-			if (Objects.nonNull(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
+			if (Objects.nonNull(authorizationHeader) && authorizationHeader.startsWith("Bearer")) {
 				try {
 					String token = authorizationHeader.substring("Bearer ".length());
 					DecodedJWT decodedJWT = tokenProvider.decodedJWT(token);

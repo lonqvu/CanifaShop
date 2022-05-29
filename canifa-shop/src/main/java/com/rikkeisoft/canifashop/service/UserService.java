@@ -1,6 +1,7 @@
 package com.rikkeisoft.canifashop.service;
 
 import java.util.HashSet;
+import java.util.List;
 
 import com.rikkeisoft.canifashop.entity.ProductEntity;
 import com.rikkeisoft.canifashop.presentation.request.ProductRequest;
@@ -8,6 +9,7 @@ import com.rikkeisoft.canifashop.presentation.response.ProductResponse;
 import com.rikkeisoft.canifashop.repository.ProductRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface UserService {
 
-	void createAdmin(UserEntity entity);
+	void createAdmin(String role, Long id);
 
 	UserResponse createUser(SignupRequest request);
 
@@ -64,6 +66,8 @@ public interface UserService {
 
 	ProductEntity EntityById(Long id);
 
+	void deleteByIdRole(Long id);
+
 
 }
 
@@ -79,18 +83,24 @@ class UserServiceImpl implements UserService {
 	private final AuthenticationManager authenticationManager;
 
 	@Override
-	public void createAdmin(UserEntity entity) {
-		entity.setPassword(new BCryptPasswordEncoder().encode(entity.getPassword()));
-		RoleEntity role = roleRepository.findByName(RoleEnum.ROLE_ADMIN.toString()).get(0);
-		entity.setRoleEntities(new HashSet<RoleEntity>());
-		entity.addRoleEntity(role);
-		userRepository.save(entity);
+	public void createAdmin(String role, Long id) {
+		UserEntity userEntity = userRepository.getById(id);
+		RoleEntity roles = roleRepository.findByNameEntity(role);
+		userEntity.setRoleEntities(new HashSet<RoleEntity>());
+		userEntity.addRoleEntity(roles);
+		userRepository.save(userEntity);
 	}
 	@Override
 	public ProductEntity EntityById(Long id) {
 		return productRepository.findById(id).orElse(null);
 	}
 
+	@Override
+	public void deleteByIdRole(Long id) {
+
+
+
+	}
 
 
 	@Override
@@ -101,7 +111,6 @@ class UserServiceImpl implements UserService {
 		if (userRepository.existsByEmail(request.getEmail())) {
 			throw new BadRequestException("User email already exist");
 		}
-		// Create new user's account
 		String password = new BCryptPasswordEncoder().encode(request.getPassword());
 		UserEntity userEntity = UserEntity.builder().username(request.getUsername()).email(request.getEmail())
 				.password(password).build();
@@ -140,7 +149,7 @@ class UserServiceImpl implements UserService {
 	@Override
 	public BasePagerData<UserResponse> getUsersByPaging(Integer page, Integer size, String keyword) {
 
-		Pageable paging = PageRequest.of(page, size);
+		Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
 
 		if (keyword.equals("-1") || keyword.isEmpty()) {
 			keyword = null;

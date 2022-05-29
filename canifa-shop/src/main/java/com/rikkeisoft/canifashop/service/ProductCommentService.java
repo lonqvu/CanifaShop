@@ -50,7 +50,14 @@ class ProductCommentServiceImpl implements ProductCommentService{
 
     @Override
     public ProductCommentResponse editComment(ProductCommentRequest productCommentRequest, Long id) {
-        return null;
+        ProductCommentEntity productCommentEntity = this.getEntityById(id);
+        if(productCommentEntity != null){
+            productCommentEntity.setContent(productCommentRequest.getContent());
+        }
+        else {
+            return null;
+        }
+        return ProductCommentMapper.convertToResponse(productCommentRepository.save(productCommentEntity));
     }
 
     @Override

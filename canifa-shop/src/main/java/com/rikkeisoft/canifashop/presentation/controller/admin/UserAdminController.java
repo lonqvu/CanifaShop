@@ -1,5 +1,9 @@
 package com.rikkeisoft.canifashop.presentation.controller.admin;
 
+import com.rikkeisoft.canifashop.entity.RoleEntity;
+import com.rikkeisoft.canifashop.repository.RoleRepository;
+import com.rikkeisoft.canifashop.service.RoleService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +22,8 @@ import com.rikkeisoft.canifashop.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @CrossOrigin(origins = "${domain.origins}")
 @RestController
 @RequestMapping("${base.api}/admin/users")
@@ -25,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class UserAdminController extends BaseController {
 	
 	public final UserService userService;
+	private final RoleService roleService;
+	private final RoleRepository roleR;
 
 	@GetMapping
 	public ResponseEntity<BasePagerData<UserResponse>> getUsersByPaging(
@@ -49,6 +57,27 @@ public class UserAdminController extends BaseController {
 	public ResponseEntity<BaseResponseEntity> deleteUser(@PathVariable("id") Long id) {
 		userService.deleteById(id);
 		return success("Delete user successful");
+	}
+
+	@PutMapping("/updateRole/{id}")
+	public ResponseEntity<BaseResponseEntity> updateAdmin(@PathVariable("id") Long id, @RequestParam("role") String role) {
+		userService.createAdmin(role,id);
+		return success("Delete user successful");
+	}
+	@GetMapping("/getNameRole")
+	public ResponseEntity<BaseResponseEntity> getAllNameRole(){
+		return success(roleService.getNameRole(),"ok");
+	}
+
+	@GetMapping("getRoleById/{id}")
+	public ResponseEntity<BaseResponseEntity> getRoleById(@PathVariable Long id){
+		return success(roleR.role(id), "OK");
+	}
+
+	@PutMapping("/updateRoles/{id}")
+	public ResponseEntity<BaseResponseEntity> getRoleById(@PathVariable Long id, @RequestParam("name") String name){
+		roleR.updateRole(id, name);
+		return success("ok");
 	}
 
 }

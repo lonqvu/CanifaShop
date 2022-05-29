@@ -3,16 +3,7 @@ package com.rikkeisoft.canifashop.entity;
 import java.math.BigDecimal;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.rikkeisoft.canifashop.base.BaseEntity;
 import com.rikkeisoft.canifashop.common.enum_.OrderStatusEnum;
@@ -38,13 +29,13 @@ public class OrderEntity extends BaseEntity {
 	@Column(name = "customer_name", length = 100, nullable = true)
 	private String customerName;
 
-	@Column(name = "customer_address", length = 200, nullable = true)
+	@Column(name = "customer_address", length = 200, nullable = false)
 	private String customerAddress;
 
-	@Column(name = "customer_phone", length = 10, nullable = true)
+	@Column(name = "customer_phone", length = 10, nullable = false)
 	private String customerPhone;
 
-	@Column(name = "customer_email", length = 100, nullable = true)
+	@Column(name = "customer_email", length = 100, nullable = false)
 	private String customerEmail;
 
 	@Column(name = "note", length = 1000, nullable = true)
@@ -64,7 +55,6 @@ public class OrderEntity extends BaseEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id")
 	private UserEntity userEntity;
-
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "orderEntity")
 	private Set<OrderDetailEntity> orderDetailEntities;
 

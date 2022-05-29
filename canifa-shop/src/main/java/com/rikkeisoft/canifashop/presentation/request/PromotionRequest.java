@@ -16,6 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class PromotionRequest {
+	private String avatar;
 
 	private String name;
 	

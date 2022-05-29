@@ -28,4 +28,7 @@ public class ProductCommentEntity extends BaseEntity {
         this.commentImages.add(productImageEntity);
         productImageEntity.setProductCommentEntity(this);
     }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "order_id")
+    private OrderEntity orderEntity;
 }

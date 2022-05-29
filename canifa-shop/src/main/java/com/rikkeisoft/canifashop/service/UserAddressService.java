@@ -53,8 +53,7 @@ class UserAddressServiceImpl implements UserAddressService {
 		checkAddressIsDefault(request);
 
 		if (id == null || id < 1) {
-			Long userId = request.getUserId();
-			UserEntity userEntity = userRepository.findById(userId).orElse(null);
+			UserEntity userEntity = userRepository.findByUsername(request.getUserName());
 			UserAddressEntity entity = UserAddressMapper.convertToEntity(request);
 			entity.setUserEntity(userEntity);
 			return UserAddressMapper.convertToResponse(userAddressRepository.save(entity));
@@ -94,7 +93,7 @@ class UserAddressServiceImpl implements UserAddressService {
 	@Transactional
 	public void checkAddressIsDefault(UserAddressRequest request) {
 		if (request.isDefault()) {
-			userAddressRepository.setNotDefaultForAddress(request.getUserId());
+//			userAddressRepository.setNotDefaultForAddress(request.getUserId());
 		}
 	}
 

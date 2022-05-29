@@ -8,11 +8,15 @@ import com.rikkeisoft.canifashop.repository.RoleRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 public interface RoleService {
 
 	void createRole(RoleEntity roleEntity);
 	
 	boolean hasRole(RoleEnum name);
+
+	List<String> getNameRole();
 }
 
 @Service
@@ -29,6 +33,11 @@ class RoleSeviceImpl implements RoleService {
 	@Override
 	public boolean hasRole(RoleEnum name) {
 		return roleRepository.existsByName(name);
+	}
+
+	@Override
+	public List<String> getNameRole() {
+		return roleRepository.getAllRole();
 	}
 
 

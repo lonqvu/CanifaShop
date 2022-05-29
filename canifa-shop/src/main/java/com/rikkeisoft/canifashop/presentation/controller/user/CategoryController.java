@@ -34,5 +34,11 @@ public class CategoryController extends BaseController {
 	public ResponseEntity<BaseResponseEntity> getCategoryParent() {
 		return success(categoryService.getCategoryParent(), "Get categories parent successful");
 	}
+	@GetMapping("/parentWomen")
+	public ResponseEntity<BaseResponseEntity> getCategoryParentWomen() {
+		return success(categoryService.getCategoryParentWomen(), "Get categories parent successful");
+	}
+
+
 
 }

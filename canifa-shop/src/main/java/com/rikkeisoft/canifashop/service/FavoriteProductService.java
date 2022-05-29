@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public interface FavoriteProductService {
     FavoriteProductResponse addListFavoriteProduct(FavoriteProductRequest favoriteProductRequest, Long id);
     List<FavoriteProductResponse> getListFavoriteProduct();
+    List<FavoriteProductResponse> getFavoriteByUserId(Long id);
     Boolean checkFavorite(Long id);
 }
 @Service
@@ -42,6 +43,12 @@ class FavoriteProductImpl implements FavoriteProductService{
     @Override
     public List<FavoriteProductResponse> getListFavoriteProduct() {
         List<FavoriteProductEntity> favoriteProductEntities = favoriteProductRepository.findAll();
+        return favoriteProductEntities.stream().map(e->FavoriteProductMapper.convertToResponse(e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FavoriteProductResponse> getFavoriteByUserId(Long id) {
+        List<FavoriteProductEntity> favoriteProductEntities = favoriteProductRepository.getAllByUserId(id);
         return favoriteProductEntities.stream().map(e->FavoriteProductMapper.convertToResponse(e)).collect(Collectors.toList());
     }
 

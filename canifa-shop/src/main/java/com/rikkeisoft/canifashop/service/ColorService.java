@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.rikkeisoft.canifashop.base.BasePagerData;
@@ -51,17 +52,7 @@ class ColorServiceImpl implements ColorService {
 	@Override
 	public BasePagerData<ColorResponse> getColorsByPaging(Integer page, Integer size, String keyword) {
 
-//		Pageable paging = PageRequest.of(page, size);
-//
-//		List<SizeEntity> sizeEntities = sizeRepository.findAll();
-//
-//		Page<ColorEntity> pagedResult = colorRepository.searchByKeyword(keyword, paging);
-//
-//		Page<ColorEntity> pagedResult = colorRepository.getAllPaging(paging);
-//
-//		return BasePagerData.build(pagedResult.map(e -> ColorMapper.convertToResponse(e, sizeEntities)));
-
-		Pageable paging = PageRequest.of(page, size);
+		Pageable paging = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created_at"));
 
 		if (keyword.equals("-1") || keyword.isEmpty()) {
 			keyword = null;
